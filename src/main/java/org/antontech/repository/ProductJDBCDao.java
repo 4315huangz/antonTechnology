@@ -61,4 +61,24 @@ public class ProductJDBCDao implements IProductDao {
             }
         return products;
     }
+
+    @Override
+    public List<Product> getById(int id) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public boolean save(Product product) {
+        return false;
+    }
+
+    @Override
+    public Product updateName(int id, String name) {
+        return null;
+    }
+
+    @Override
+    public void delete(int id) {
+
+    }
 }
