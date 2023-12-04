@@ -8,11 +8,11 @@ import org.junit.Test;
 import java.util.List;
 import static junit.framework.Assert.assertEquals;
 
-public class ProductDaoTest {
-    ProductDao productDao;
+public class ProductJDBCDaoTest {
+    ProductJDBCDao productJDBCDao;
     @Before
     public void setup(){
-        productDao = new ProductDao();
+        productJDBCDao = new ProductJDBCDao();
     }
 
     @After
@@ -21,7 +21,7 @@ public class ProductDaoTest {
 
     @Test
     public void getProductsTest() {
-        List<Product> productList = productDao.getProducts();
+        List<Product> productList = productJDBCDao.getProducts();
         assertEquals(0, productList.size());
     }
 }

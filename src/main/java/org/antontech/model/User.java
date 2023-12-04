@@ -1,12 +1,24 @@
 package org.antontech.model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "users")
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
-    private int product_id;
+    @Column(name = "address")
     private String address;
+    @Column(name = "title")
     private String title;
+    @Column(name = "email")
     private String email;
+    @Column(name = "type")
     private String type;
+    @Column(name = "product_id")
+    private int product_id;
 
     public User() {
     }
@@ -19,11 +31,11 @@ public class User {
         this.id = id;
     }
 
-    public int getCompany() {
+    public int getProduct_id() {
         return product_id;
     }
 
-    public void setCompany(int product_id) {
+    public void setProduct_id(int product_id) {
         this.product_id = product_id;
     }
 

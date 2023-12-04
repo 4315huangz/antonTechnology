@@ -8,11 +8,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductDao implements IProductDao {
+public class ProductJDBCDao implements IProductDao {
     private static final String DB_URL = "jdbc:postgresql://localhost:5430/antontech_db";
     private static final String USER = "admin";
     private static final String PASS = "ziwei123!";
-    private static final Logger log = LoggerFactory.getLogger(ProductDao.class);
+    private static final Logger log = LoggerFactory.getLogger(ProductJDBCDao.class);
 
 
     public List<Product> getProducts() {

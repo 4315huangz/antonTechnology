@@ -1,12 +1,22 @@
 package org.antontech.model;
 
+import javax.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name = "projects")
 public class Project {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "project_id")
     private int project_id;
+    @Column(name = "user_id")
     private int user_id;
+    @Column(name = "start_date")
     private Date start_date;
+    @Column(name = "description")
     private String description;
+    @Column(name = "manager")
     private String manager;
 
     public Project() {
