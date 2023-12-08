@@ -70,4 +70,39 @@ public class UserJDBCDao implements IUserDao{
         }
         return users;
     }
+
+    @Override
+    public boolean save(User user) {
+        return false;
+    }
+
+    @Override
+    public User getById(int id) {
+        return null;
+    }
+
+    @Override
+    public void updateCompanyName(int id, String name) {
+
+    }
+
+    @Override
+    public void updateAddress(int id, String address) {
+
+    }
+
+    @Override
+    public void updateIndustry(int id, String industry) {
+
+    }
+
+    @Override
+    public void updateManager(int id, String manager, String title, String email, String phone) {
+
+    }
+
+    @Override
+    public void delete(int id) {
+
+    }
 }

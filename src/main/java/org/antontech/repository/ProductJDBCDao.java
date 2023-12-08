@@ -61,7 +61,7 @@ public class ProductJDBCDao implements IProductDao {
     }
 
     @Override
-    public List<Product> getById(int id) throws SQLException {
+    public List<Product> getByIndustry(String industry)  {
         return null;
     }
 
@@ -71,12 +71,24 @@ public class ProductJDBCDao implements IProductDao {
     }
 
     @Override
+    public Product getById(int id) {
+        return null;
+    }
+
+    @Override
     public Product updateName(int id, String name) {
         return null;
+    }
+
+    @Override
+    public void updateDescription(int id, String description) {
+
     }
 
     @Override
     public void delete(int id) {
 
     }
+
+
 }

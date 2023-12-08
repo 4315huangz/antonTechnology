@@ -8,15 +8,21 @@ import java.util.List;
 public interface IProductDao {
     List<Product> getProducts() throws SQLException;
 
-    //Retrieve
-    List<Product> getById(int id) throws SQLException;
-
-    //Create
+    //Create product
     boolean save(Product product);
 
-    //Update
+    //Search product by id
+    Product getById(int id);
+
+    //Search product by Industry
+    List<Product> getByIndustry(String industry);
+
+    //Update product name
     Product updateName(int id, String name);
 
-    //Delete
+    //Update product description
+    void updateDescription(int id, String description);
+
+    //Delete product
     void delete(int id);
 }

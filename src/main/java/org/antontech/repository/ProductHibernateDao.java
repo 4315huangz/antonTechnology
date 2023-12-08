@@ -33,7 +33,12 @@ public class ProductHibernateDao implements IProductDao {
     }
 
     @Override
-    public List<Product> getById(int id) throws SQLException {
+    public Product getById(int id)  {
+        return null;
+    }
+
+    @Override
+    public List<Product> getByIndustry(String industry) {
         return null;
     }
 
@@ -60,6 +65,11 @@ public class ProductHibernateDao implements IProductDao {
     @Override
     public Product updateName(int id, String name) {
         return null;
+    }
+
+    @Override
+    public void updateDescription(int id, String description) {
+
     }
 
     @Override

@@ -64,4 +64,29 @@ public class ProjectJDBCDao implements IProjectDao {
         }
         return projects;
     }
+
+    @Override
+    public boolean save(Project project) {
+        return false;
+    }
+
+    @Override
+    public Project getById(int id) {
+        return null;
+    }
+
+    @Override
+    public void updateDescription(int id, String description) {
+
+    }
+
+    @Override
+    public void updateManager(int id, String manager) {
+
+    }
+
+    @Override
+    public void delete(int id) {
+
+    }
 }
