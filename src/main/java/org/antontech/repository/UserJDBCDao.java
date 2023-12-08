@@ -32,18 +32,26 @@ public class UserJDBCDao implements IUserDao{
             log.info("Get all the attribute and translate to Java");
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int id = rs.getInt("user_id");
+                String company_name = rs.getString("company_name");
                 String address = rs.getString("address");
+                String industry = rs.getString("industry");
+                String manager_name = rs.getString("manager_name");
                 String title = rs.getString("title");
                 String email = rs.getString("email");
+                String phone = rs.getString("phone");
                 String type = rs.getString("type");
                 int product_id = rs.getInt("product_id");
 
                 User user = new User();
-                user.setId(id);
+                user.setUser_id(id);
+                user.setCompany_name(company_name);
                 user.setAddress(address);
+                user.setIndustry(industry);
+                user.setManager_name(manager_name);
                 user.setTitle(title);
                 user.setEmail(email);
+                user.setPhone(phone);
                 user.setType(type);
                 user.setProduct_id(product_id);
                 users.add(user);

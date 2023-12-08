@@ -13,10 +13,8 @@ public class Product {
     private String name;
     @Column(name = "description")
     private String description;
-    @Column(name = "company")
-    private String company;
-    @Column(name = "price")
-    private double price;
+    @Column(name="user_id")
+    private int user_id;
 
     public Product() {
     }
@@ -45,19 +43,7 @@ public class Product {
         this.description = description;
     }
 
-    public String getCompany() {
-        return company;
-    }
+    public int getUser_id() {return user_id;}
 
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
+    public void setUser_id(int user_id) {this.user_id = user_id;}
 }

@@ -34,7 +34,8 @@ public class ProjectJDBCDao implements IProjectDao {
 
             while (rs.next()) {
                 int project_id = rs.getInt("project_id");
-                int user_id = rs.getInt("user_id");
+                int oem = rs.getInt("oem");
+                int supplier = rs.getInt("supplier");
                 Date start_date = rs.getDate("start_date");
                 String description = rs.getString("description");
                 String manager = rs.getString("manager");
@@ -42,7 +43,8 @@ public class ProjectJDBCDao implements IProjectDao {
 
                 Project project = new Project();
                 project.setProject_id(project_id);
-                project.setUser_id(user_id);
+                project.setOem(oem);
+                project.setSupplier(supplier);
                 project.setStart_date(start_date);
                 project.setDescription(description);
                 project.setManager(manager);

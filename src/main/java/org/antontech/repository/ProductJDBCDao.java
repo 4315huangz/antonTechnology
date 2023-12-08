@@ -35,16 +35,14 @@ public class ProductJDBCDao implements IProductDao {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String description = rs.getString("description");
-                String company = rs.getString("company");
-                double price = rs.getDouble("price");
+                int user_id = rs.getInt("user_id");
                 log.info("Get all attributes and translate to java" + id);
 
                 Product product = new Product();
                 product.setId(id);
                 product.setName(name);
                 product.setDescription(description);
-                product.setCompany(company);
-                product.setPrice(price);
+                product.setUser_id(user_id);
                 products.add(product);
             }
         } catch (SQLException e){

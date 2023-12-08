@@ -8,10 +8,12 @@ import java.util.Date;
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "project_id")
+    @Column(name="project_id")
     private int project_id;
-    @Column(name = "user_id")
-    private int user_id;
+    @Column(name = "oem")
+    private int oem;
+    @Column(name = "supplier")
+    private int supplier;
     @Column(name = "start_date")
     private Date start_date;
     @Column(name = "description")
@@ -30,13 +32,13 @@ public class Project {
         this.project_id = project_id;
     }
 
-    public int getUser_id() {
-        return user_id;
-    }
+    public int getOem() {return oem;}
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
-    }
+    public void setOem(int oem) {this.oem = oem;}
+
+    public int getSupplier() {return supplier;}
+
+    public void setSupplier(int supplier) {this.supplier = supplier;}
 
     public Date getStart_date() {
         return start_date;
