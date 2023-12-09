@@ -77,32 +77,37 @@ public class UserJDBCDao implements IUserDao{
     }
 
     @Override
-    public User getById(int id) {
+    public User getById(long id) {
         return null;
     }
 
     @Override
-    public void updateCompanyName(int id, String name) {
+    public List<User> getUsersByIndustry(String industry) {
+        return null;
+    }
+
+    @Override
+    public void updateCompanyName(long id, String name) {
 
     }
 
     @Override
-    public void updateAddress(int id, String address) {
+    public void updateAddress(long id, String address) {
 
     }
 
     @Override
-    public void updateIndustry(int id, String industry) {
+    public void updateIndustry(long id, String industry) {
 
     }
 
     @Override
-    public void updateManager(int id, String manager, String title, String email, String phone) {
+    public void updateManager(long id, String manager, String title, String email, String phone) {
 
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(long id) {
 
     }
 }

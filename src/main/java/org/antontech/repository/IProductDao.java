@@ -12,17 +12,14 @@ public interface IProductDao {
     boolean save(Product product);
 
     //Search product by id
-    Product getById(int id);
-
-    //Search product by Industry
-    List<Product> getByIndustry(String industry);
+    Product getById(long id);
 
     //Update product name
-    Product updateName(int id, String name);
+    void updateName(long id, String name);
 
     //Update product description
-    void updateDescription(int id, String description);
+    void updateDescription(long id, String description);
 
     //Delete product
-    void delete(int id);
+    void delete(long id);
 }

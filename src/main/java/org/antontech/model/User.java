@@ -8,7 +8,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private int user_id;
+    private long user_id;
     @Column(name = "company_name")
     private String company_name;
     @Column(name = "address")
@@ -26,14 +26,14 @@ public class User {
     @Column(name = "type")
     private String type;
     @Column(name = "product_id")
-    private int product_id;
+    private long product_id;
 
     public User() {
     }
 
-    public int getUser_id() {return user_id;}
+    public long getUser_id() {return user_id;}
 
-    public void setUser_id(int user_id) {this.user_id = user_id;}
+    public void setUser_id(long user_id) {this.user_id = user_id;}
 
     public String getCompany_name() {return company_name;}
 
@@ -67,8 +67,8 @@ public class User {
 
     public void setType(String type) {this.type = type;}
 
-    public int getProduct_id() {return product_id;}
+    public long getProduct_id() {return product_id;}
 
-    public void setProduct_id(int product_id) {this.product_id = product_id;}
+    public void setProduct_id(long product_id) {this.product_id = product_id;}
 }
 

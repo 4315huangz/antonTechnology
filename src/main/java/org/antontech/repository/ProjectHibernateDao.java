@@ -1,6 +1,7 @@
 package org.antontech.repository;
 
 import org.antontech.model.Product;
+import org.antontech.model.Project;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -13,49 +14,34 @@ import util.HibernateUtil;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ProductHibernateDao implements IProductDao {
+
+public class ProjectHibernateDao implements IProjectDao{
     private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-    private final Logger log = LoggerFactory.getLogger(ProductHibernateDao.class);
+    private final Logger logger = LoggerFactory.getLogger(ProjectHibernateDao.class);
+
     @Override
-    public List<Product> getProducts() throws SQLException {
-        List<Product> products;
+    public List<Project> getProjects() throws SQLException {
+        List<Project> projects;
         try {
             Session session = sessionFactory.openSession();
-            String hql = "from Product";
-            Query<Product> query = session.createQuery(hql);
-            products = query.list();
+            String hql = "From Project";
+            Query<Project> query = session.createQuery(hql);
+            projects = query.list();
             session.close();
-            return products;
+            return projects;
         } catch (HibernateException e) {
-            log.error("Open session exception or close session exception", e);
+            logger.error("Open session exception or close session exception", e);
             throw e;
         }
     }
 
     @Override
-    public Product getById(long id)  {
-        String hql = "FROM Product P WHERE P.id = :Id";
-        Product product = null;
-        try {
-            Session session = sessionFactory.openSession();
-            Query<Product> query = session.createQuery(hql);
-            query.setParameter("Id", id);
-            product = query.uniqueResult();
-            session.close();
-            return product;
-        } catch (HibernateException e) {
-            log.error("Unable to get product by product id = ${}", id, e);
-            throw e;
-        }
-    }
-
-    @Override
-    public boolean save(Product product) {
+    public boolean save(Project project) {
         Transaction transaction = null;
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
-            session.save(product);
+            session.save(project);
             transaction.commit();
             session.close();
             return true;
@@ -63,29 +49,24 @@ public class ProductHibernateDao implements IProductDao {
             if( transaction != null ){
                 transaction.rollback();
             }
-            log.error("Failed to save product ${}", product);
+            logger.error("Failed to save project ${}", project);
             throw e;
         }
     }
 
     @Override
-    public void updateName(long id, String name) {
-        Transaction transaction = null;
-        String hql = "UPDATE Product as p set p.name = :name WHERE p.id = :id";
+    public Project getById(long id) {
+        String hql = "FROM Project Pr WHERE Pr.project_id = :Id";
+        Project project = null;
         try {
             Session session = sessionFactory.openSession();
-            transaction = session.beginTransaction();
-            Query<Product> query = session.createQuery(hql);
-            query.setParameter("id", id);
-            query.setParameter("name", name);
-            query.executeUpdate();
-            transaction.commit();
+            Query<Project> query = session.createQuery(hql);
+            query.setParameter("Id", id);
+            project = query.uniqueResult();
             session.close();
+            return project;
         } catch (HibernateException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            log.error("Failed to update product name for ${}", id, e);
+            logger.error("Unable to get project by project id = ${}", id, e);
             throw e;
         }
     }
@@ -93,28 +74,51 @@ public class ProductHibernateDao implements IProductDao {
     @Override
     public void updateDescription(long id, String description) {
         Transaction transaction = null;
-        String hql = "UPDATE Product as p set p.description = :description WHERE p.id = :id";
+        String hql = "UPDATE Project as pr set pr.description = :description WHERE pr.project_id = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             Query<Product> query = session.createQuery(hql);
+            query.setParameter("id", id);
+            query.setParameter("description", description);
             query.executeUpdate();
             transaction.commit();
             session.close();
         } catch (HibernateException e) {
-            if(transaction != null){
+            if (transaction != null) {
                 transaction.rollback();
             }
-            log.error("Failed to update product description for ${}", id, e);
+            logger.error("Failed to update project description for ${}", id, e);
             throw e;
         }
+    }
 
+    @Override
+    public void updateManager(long id, String manager) {
+        Transaction transaction = null;
+        String hql = "UPDATE Project as pr set pr.manager = :manager WHERE pr.project_id = :id";
+        try {
+            Session session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+            Query<Product> query = session.createQuery(hql);
+            query.setParameter("id", id);
+            query.setParameter("manager", manager);
+            query.executeUpdate();
+            transaction.commit();
+            session.close();
+        } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            logger.error("Failed to update project manager for ${}", id, e);
+            throw e;
+        }
     }
 
     @Override
     public void delete(long id) {
         Transaction transaction = null;
-        String hql = "delete Product as p where p.id = :Id";
+        String hql = "delete Project as pr where pr.project_id = :Id";
 
         try {
             Session session = sessionFactory.openSession();
@@ -128,8 +132,9 @@ public class ProductHibernateDao implements IProductDao {
             if(transaction != null) {
                 transaction.rollback();
             }
-            log.error("Unable to delete product id = ${}", id, e);
+            logger.error("Unable to delete project id = ${}", id, e);
             throw e;
         }
+
     }
 }

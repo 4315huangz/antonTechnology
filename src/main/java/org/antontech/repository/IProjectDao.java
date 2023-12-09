@@ -13,15 +13,15 @@ public interface IProjectDao {
     boolean save(Project project);
 
     //Search project by id
-    Project getById(int id);
+    Project getById(long id);
 
     //Update project description
-    void updateDescription(int id, String description);
+    void updateDescription(long id, String description);
 
     //Update project manager
-    void updateManager(int id, String manager);
+    void updateManager(long id, String manager);
 
     //Delete project
-    void delete(int id);
+    void delete(long id);
 
 }

@@ -13,21 +13,24 @@ public interface IUserDao {
     boolean save(User user);
 
     //Search user by id
-    User getById(int id);
+    User getById(long id);
+
+    //Search user by Industry
+    List<User> getUsersByIndustry(String industry);
 
     //Update company name
-    void updateCompanyName(int id, String name);
+    void updateCompanyName(long id, String name);
 
     //Update address
-    void updateAddress(int id, String address);
+    void updateAddress(long id, String address);
 
     //Update industry
-    void updateIndustry(int id, String industry);
+    void updateIndustry(long id, String industry);
 
     //Update manager
-    void updateManager(int id, String manager, String title, String email, String phone);
+    void updateManager(long id, String manager, String title, String email, String phone);
 
     //Delete user
-    void delete(int id);
+    void delete(long id);
 
 }

@@ -61,32 +61,27 @@ public class ProductJDBCDao implements IProductDao {
     }
 
     @Override
-    public List<Product> getByIndustry(String industry)  {
-        return null;
-    }
-
-    @Override
     public boolean save(Product product) {
         return false;
     }
 
     @Override
-    public Product getById(int id) {
+    public Product getById(long id) {
         return null;
     }
 
     @Override
-    public Product updateName(int id, String name) {
-        return null;
-    }
-
-    @Override
-    public void updateDescription(int id, String description) {
+    public void updateName(long id, String name) {
 
     }
 
     @Override
-    public void delete(int id) {
+    public void updateDescription(long id, String description) {
+
+    }
+
+    @Override
+    public void delete(long id) {
 
     }
 

@@ -71,22 +71,22 @@ public class ProjectJDBCDao implements IProjectDao {
     }
 
     @Override
-    public Project getById(int id) {
+    public Project getById(long id) {
         return null;
     }
 
     @Override
-    public void updateDescription(int id, String description) {
+    public void updateDescription(long id, String description) {
 
     }
 
     @Override
-    public void updateManager(int id, String manager) {
+    public void updateManager(long id, String manager) {
 
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(long id) {
 
     }
 }

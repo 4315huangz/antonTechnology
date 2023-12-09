@@ -1,6 +1,7 @@
 package org.antontech.model;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Entity
@@ -9,12 +10,12 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="project_id")
-    private int project_id;
+    private long project_id;
     @Column(name = "oem")
-    private int oem;
+    private long oem;
     @Column(name = "supplier")
-    private int supplier;
-    @Column(name = "start_date")
+    private long supplier;
+    @Column(name = "start_date", columnDefinition = "DATE")
     private Date start_date;
     @Column(name = "description")
     private String description;
@@ -24,21 +25,21 @@ public class Project {
     public Project() {
     }
 
-    public int getProject_id() {
+    public long getProject_id() {
         return project_id;
     }
 
-    public void setProject_id(int project_id) {
+    public void setProject_id(long project_id) {
         this.project_id = project_id;
     }
 
-    public int getOem() {return oem;}
+    public long getOem() {return oem;}
 
-    public void setOem(int oem) {this.oem = oem;}
+    public void setOem(long oem) {this.oem = oem;}
 
-    public int getSupplier() {return supplier;}
+    public long getSupplier() {return supplier;}
 
-    public void setSupplier(int supplier) {this.supplier = supplier;}
+    public void setSupplier(long supplier) {this.supplier = supplier;}
 
     public Date getStart_date() {
         return start_date;
