@@ -1,6 +1,7 @@
 package org.antontech.model;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -25,8 +26,9 @@ public class User {
     private String phone;
     @Column(name = "type")
     private String type;
-    @Column(name = "product_id")
-    private long product_id;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private Set<Product> products;
 
     public User() {
     }
@@ -67,8 +69,6 @@ public class User {
 
     public void setType(String type) {this.type = type;}
 
-    public long getProduct_id() {return product_id;}
 
-    public void setProduct_id(long product_id) {this.product_id = product_id;}
 }
 

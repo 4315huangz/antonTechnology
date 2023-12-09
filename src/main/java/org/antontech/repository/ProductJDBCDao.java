@@ -42,7 +42,6 @@ public class ProductJDBCDao implements IProductDao {
                 product.setId(id);
                 product.setName(name);
                 product.setDescription(description);
-                product.setUser_id(user_id);
                 products.add(product);
             }
         } catch (SQLException e){

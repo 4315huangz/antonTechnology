@@ -53,7 +53,6 @@ public class UserJDBCDao implements IUserDao{
                 user.setEmail(email);
                 user.setPhone(phone);
                 user.setType(type);
-                user.setProduct_id(product_id);
                 users.add(user);
             }
         } catch (SQLException e) {

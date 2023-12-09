@@ -26,7 +26,6 @@ public class UserHibernateDaoTest {
         user.setEmail("John.Jay@edf.com");
         user.setPhone("123-456-7890");
         user.setType("OEM");
-        user.setProduct_id(1);
         userHibernateDao.save(user);
 
     }
@@ -39,7 +38,7 @@ public class UserHibernateDaoTest {
     @Test
     public void getUsersTest() throws SQLException {
         List<User> userList = userHibernateDao.getUsers();
-        assertEquals(4, userList.size());
+        assertEquals(3, userList.size());
 
     }
 

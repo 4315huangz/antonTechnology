@@ -1,6 +1,7 @@
 package org.antontech.repository;
 
 import org.antontech.model.Product;
+import org.antontech.model.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,21 +12,38 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 
 public class ProductHibernateDaoTest {
-    ProductHibernateDao productHibernateDao;
+    IProductDao productHibernateDao;
+    IUserDao userHibernateDao;
+
     Product product;
+    User user;
 
     @Before
     public void setup(){
         productHibernateDao = new ProductHibernateDao();
+        userHibernateDao = new UserHibernateDao();
         product = new Product();
+        user = new User();
+        user.setTitle("test title");
+        user.setEmail("test email");
+        user.setPhone("test phone");
+        user.setAddress("test address");
+        user.setType("OEM");
+        user.setIndustry("tes industry");
+        user.setManager_name("test manager");
+        user.setCompany_name("test company");
+        userHibernateDao.save(user);
+
+
         product.setName("TestProduct");
         product.setDescription("Test description");
-        product.setUser_id(3);
+        product.setUser(user);
         productHibernateDao.save(product);
     }
 
     @After
     public void teardown(){
+        userHibernateDao.delete(user.getUser_id());
         productHibernateDao.delete(product.getId());
     }
 

@@ -13,8 +13,10 @@ public class Product {
     private String name;
     @Column(name = "description")
     private String description;
-    @Column(name="user_id")
-    private long user_id;
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name="user_id")
+    private User user;
 
     public Product() {
     }
@@ -43,7 +45,7 @@ public class Product {
         this.description = description;
     }
 
-    public long getUser_id() {return user_id;}
+    public User getUser() {return user;}
 
-    public void setUser_id(long user_id) {this.user_id = user_id;}
+    public void setUser(User user) {this.user = user;}
 }
