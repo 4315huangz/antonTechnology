@@ -1,6 +1,15 @@
 package org.antontech.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
+import javax.persistence.ManyToOne;
+import javax.persistence.CascadeType;
+import javax.persistence.JoinColumn;
+
 
 @Entity
 @Table(name = "products")
@@ -14,8 +23,8 @@ public class Product {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name="user_id")
+    @ManyToOne
+    @JoinColumn(name="user_id", referencedColumnName = "id")
     private User user;
 
     public Product() {

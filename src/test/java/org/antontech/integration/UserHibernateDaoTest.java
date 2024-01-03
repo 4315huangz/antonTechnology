@@ -1,7 +1,8 @@
-package org.antontech.repository;
+package org.antontech.integration;
 
 import org.antontech.model.Product;
 import org.antontech.model.User;
+import org.antontech.repository.UserHibernateDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,10 +19,10 @@ public class UserHibernateDaoTest {
     @Before
     public void setup() {
         userHibernateDao = new UserHibernateDao();
-        user.setCompany_name("ABC.INC");
+        user.setCompanyName("ABC.INC");
         user.setAddress("US");
         user.setIndustry("Electricity");
-        user.setManager_name("John Jay");
+        user.setManagerName("John Jay");
         user.setTitle("President");
         user.setEmail("John.Jay@edf.com");
         user.setPhone("123-456-7890");
@@ -32,7 +33,7 @@ public class UserHibernateDaoTest {
 
     @After
     public void teardown() {
-        userHibernateDao.delete(user.getUser_id());
+        userHibernateDao.delete(user.getUserId());
     }
 
     @Test
@@ -47,9 +48,9 @@ public class UserHibernateDaoTest {
         //Define Test Values
         long userId = 3;
         String newCompanyName = "EDF.INC";
-        String originalName = userHibernateDao.getById(userId).getCompany_name();
+        String originalName = userHibernateDao.getById(userId).getCompanyName();
         userHibernateDao.updateCompanyName(userId, newCompanyName);
-        String updatedName = userHibernateDao.getById(userId).getCompany_name();
+        String updatedName = userHibernateDao.getById(userId).getCompanyName();
 
         assertEquals(newCompanyName, updatedName);
 
@@ -93,7 +94,7 @@ public class UserHibernateDaoTest {
         User user;
         //Get original parameters
         user = userHibernateDao.getById(userId);
-        String originalManager = user.getManager_name();
+        String originalManager = user.getManagerName();
         String originalTitle = user.getTitle();
         String originalEmail = user.getEmail();
         String originalPhone = user.getPhone();
@@ -107,7 +108,7 @@ public class UserHibernateDaoTest {
 
         //get new pamaneters
         user = userHibernateDao.getById(userId);
-        String updatedManager = user.getManager_name();
+        String updatedManager = user.getManagerName();
         String updatedTitle = user.getTitle();
         String updatedEmail = user.getEmail();
         String updatedPhone = user.getPhone();

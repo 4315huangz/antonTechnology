@@ -1,7 +1,11 @@
-package org.antontech.repository;
+package org.antontech.integration;
 
 import org.antontech.model.Product;
 import org.antontech.model.User;
+import org.antontech.repository.IProductDao;
+import org.antontech.repository.IUserDao;
+import org.antontech.repository.ProductHibernateDao;
+import org.antontech.repository.UserHibernateDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +34,8 @@ public class ProductHibernateDaoTest {
         user.setAddress("test address");
         user.setType("OEM");
         user.setIndustry("tes industry");
-        user.setManager_name("test manager");
-        user.setCompany_name("test company");
+        user.setManagerName("test manager");
+        user.setCompanyName("test company");
         userHibernateDao.save(user);
 
 
@@ -43,7 +47,7 @@ public class ProductHibernateDaoTest {
 
     @After
     public void teardown(){
-        userHibernateDao.delete(user.getUser_id());
+        userHibernateDao.delete(user.getUserId());
         productHibernateDao.delete(product.getId());
     }
 

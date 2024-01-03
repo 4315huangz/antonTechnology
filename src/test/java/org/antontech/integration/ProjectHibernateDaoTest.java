@@ -1,6 +1,7 @@
-package org.antontech.repository;
+package org.antontech.integration;
 
 import org.antontech.model.Project;
+import org.antontech.repository.ProjectHibernateDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class ProjectHibernateDaoTest {
         project = new Project();
         project.setOem(3);
         project.setSupplier(16);
-        project.setStart_date(new Date());
+        project.setStartDate(new Date());
         project.setDescription("Test the project description");
         project.setManager("Anton Technology LLC");
         projectHibernateDao.save(project);
@@ -29,7 +30,7 @@ public class ProjectHibernateDaoTest {
 
     @After
     public  void teardown(){
-        projectHibernateDao.delete(project.getProject_id());
+        projectHibernateDao.delete(project.getProjectId());
     }
 
     @Test

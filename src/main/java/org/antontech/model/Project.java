@@ -1,7 +1,11 @@
 package org.antontech.model;
 
-import javax.persistence.*;
-import java.sql.Timestamp;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
 import java.util.Date;
 
 @Entity
@@ -10,13 +14,13 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="project_id")
-    private long project_id;
+    private long projectId;
     @Column(name = "oem")
     private long oem;
     @Column(name = "supplier")
     private long supplier;
     @Column(name = "start_date", columnDefinition = "DATE")
-    private Date start_date;
+    private Date startDate;
     @Column(name = "description")
     private String description;
     @Column(name = "manager")
@@ -25,12 +29,10 @@ public class Project {
     public Project() {
     }
 
-    public long getProject_id() {
-        return project_id;
-    }
+    public long getProjectId() {return projectId;}
 
-    public void setProject_id(long project_id) {
-        this.project_id = project_id;
+    public void setProjectId(long projectId) {
+        this.projectId = projectId;
     }
 
     public long getOem() {return oem;}
@@ -41,12 +43,12 @@ public class Project {
 
     public void setSupplier(long supplier) {this.supplier = supplier;}
 
-    public Date getStart_date() {
-        return start_date;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setStart_date(Date start_date) {
-        this.start_date = start_date;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
     public String getDescription() {

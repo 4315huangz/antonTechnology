@@ -1,6 +1,14 @@
 package org.antontech.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
+import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
+import javax.persistence.FetchType;
 import java.util.Set;
 
 @Entity
@@ -9,15 +17,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private long user_id;
+    private long userId;
     @Column(name = "company_name")
-    private String company_name;
+    private String companyName;
     @Column(name = "address")
     private String address;
     @Column(name = "industry")
     private String industry;
     @Column(name = "manager_name")
-    private String manager_name;
+    private String managerName;
     @Column(name = "title")
     private String title;
     @Column(name = "email")
@@ -33,13 +41,13 @@ public class User {
     public User() {
     }
 
-    public long getUser_id() {return user_id;}
+    public long getUserId() {return userId;}
 
-    public void setUser_id(long user_id) {this.user_id = user_id;}
+    public void setUserId(long userId) {this.userId = userId;}
 
-    public String getCompany_name() {return company_name;}
+    public String getCompanyName() {return companyName;}
 
-    public void setCompany_name(String company_name) {this.company_name = company_name;}
+    public void setCompanyName(String companyName) {this.companyName = companyName;}
 
     public String getAddress() {return address;}
 
@@ -49,9 +57,9 @@ public class User {
 
     public void setIndustry(String industry) {this.industry = industry;}
 
-    public String getManager_name() {return manager_name;}
+    public String getManagerName() {return managerName;}
 
-    public void setManager_name(String manager_name) {this.manager_name = manager_name;}
+    public void setManagerName(String managerName) {this.managerName = managerName;}
 
     public String getTitle() {return title;}
 

@@ -39,13 +39,13 @@ public class ProjectJDBCDao implements IProjectDao {
                 Date start_date = rs.getDate("start_date");
                 String description = rs.getString("description");
                 String manager = rs.getString("manager");
-                log.info("Get all attributes and translate to java" + project_id);
+                log.info("Get all attributes and translate to java object " + project_id);
 
                 Project project = new Project();
-                project.setProject_id(project_id);
+                project.setProjectId(project_id);
                 project.setOem(oem);
                 project.setSupplier(supplier);
-                project.setStart_date(start_date);
+                project.setStartDate(start_date);
                 project.setDescription(description);
                 project.setManager(manager);
                 projects.add(project);
@@ -67,6 +67,43 @@ public class ProjectJDBCDao implements IProjectDao {
 
     @Override
     public boolean save(Project project) {
+        log.info("Start to create Project in postgres via JDBC");
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        log.debug("Setup required attributes");
+
+        try {
+            con = DriverManager.getConnection(DB_URL, USER, PASS);
+            String sql = "INSERT INTO projects (oem, supplier, start_date, description, manager) VALUES (?,?,?,?,?)";
+            stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            log.info("Connects to DB and execute the insert query");
+            stmt.setLong(1, project.getOem());
+            stmt.setLong(2, project.getSupplier());
+            java.util.Date utilDate = project.getStartDate();
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+            stmt.setDate(3, sqlDate );
+            stmt.setString(4, project.getDescription());
+            stmt.setString(5, project.getManager());
+            stmt.executeUpdate();
+
+            rs = stmt.getGeneratedKeys();
+            if(rs.next()) {
+                long generatedId = rs.getLong(1);
+                project.setProjectId(generatedId);
+                return true;
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute update", e);
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(stmt != null) stmt.close();
+                if(con != null) con.close();
+            } catch (SQLException e) {
+                log.error("Unable to close the JDBC Connection",e);
+            }
+        }
         return false;
     }
 
@@ -87,6 +124,32 @@ public class ProjectJDBCDao implements IProjectDao {
 
     @Override
     public void delete(long id) {
+        log.info("Start to delete Project in postgres via JDBC");
+        Connection con = null;
+        PreparedStatement ps = null;
+        int rowDeleted;
+        log.debug("Setup required attributes");
 
+        try {
+            con = DriverManager.getConnection(DB_URL, USER, PASS);
+            String sql = "DELETE FROM projects WHERE project_id = ?";
+            ps = con.prepareStatement(sql);
+            log.info("Connects to DB and execute the delete query");
+            ps.setLong(1, id);
+            rowDeleted = ps.executeUpdate();
+            if(rowDeleted > 0)
+                log.info("Project {} deleted successfully.", id);
+            else
+                log.info("Failed to delete project {}", id);
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute delete", e);
+        } finally {
+            try {
+                if(ps != null) ps.close();
+                if(con != null) con.close();
+            } catch (SQLException e) {
+                log.error("Unable to close the JDBC Connection",e);
+            }
+        }
     }
 }
