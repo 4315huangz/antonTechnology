@@ -1,6 +1,8 @@
 package org.antontech.integration;
 
+import junit.framework.Assert;
 import org.antontech.model.Project;
+import org.antontech.model.User;
 import org.antontech.repository.ProjectHibernateDao;
 import org.junit.After;
 import org.junit.Before;
@@ -37,5 +39,31 @@ public class ProjectHibernateDaoTest {
     public void getProjectsTest() throws SQLException {
         List<Project> projectList = projectHibernateDao.getProjects();
         assertEquals(1, projectList.size());
+    }
+
+    @Test
+    public void updateDescriptionTest() {
+        long projectId = project.getProjectId();
+        String newDesc = "Updated project description";
+        String originalDesc = projectHibernateDao.getById(projectId).getDescription();
+        projectHibernateDao.updateDescription(projectId, newDesc);
+        String updatedDesc = projectHibernateDao.getById(projectId).getDescription();
+        Assert.assertEquals(newDesc, updatedDesc);
+
+        projectHibernateDao.updateDescription(projectId, originalDesc);
+    }
+
+    @Test
+    public  void updateManagerTest(){
+        long projectId = project.getProjectId();
+        String originalManager = project.getManager();
+        String newManager = "Updated Manager";
+       projectHibernateDao.updateManager(projectId, newManager);
+       String updatedManager = projectHibernateDao.getById(projectId).getManager();
+       Assert.assertEquals(newManager, updatedManager);
+
+       projectHibernateDao.updateManager(projectId, originalManager);
+
+
     }
 }

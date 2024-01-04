@@ -21,6 +21,7 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public List<Project> getProjects() throws SQLException {
+        logger.info("Start to getProjects from postgres via HibernateDao");
         List<Project> projects;
         try {
             Session session = sessionFactory.openSession();
@@ -37,6 +38,7 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public boolean save(Project project) {
+        logger.info("Start to save project in postgres via HibernateDao");
         Transaction transaction = null;
         try {
             Session session = sessionFactory.openSession();
@@ -47,6 +49,7 @@ public class ProjectHibernateDao implements IProjectDao{
             return true;
         } catch (HibernateException e) {
             if( transaction != null ){
+                logger.error("Save transaction failed, rollback.");
                 transaction.rollback();
             }
             logger.error("Failed to save project ${}", project);
@@ -56,7 +59,8 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public Project getById(long id) {
-        String hql = "FROM Project Pr WHERE Pr.project_id = :Id";
+        logger.info("Start to get projectById in postgres via HibernateDao");
+        String hql = "FROM Project Pr WHERE Pr.projectId = :Id";
         Project project = null;
         try {
             Session session = sessionFactory.openSession();
@@ -66,15 +70,16 @@ public class ProjectHibernateDao implements IProjectDao{
             session.close();
             return project;
         } catch (HibernateException e) {
-            logger.error("Unable to get project by project id = ${}", id, e);
+            logger.error("Unable to get project by project id = {}", id, e);
             throw e;
         }
     }
 
     @Override
     public void updateDescription(long id, String description) {
+        logger.info("Start to update project description in postgres via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE Project as pr set pr.description = :description WHERE pr.project_id = :id";
+        String hql = "UPDATE Project as pr set pr.description = :description WHERE pr.projectId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
@@ -86,17 +91,19 @@ public class ProjectHibernateDao implements IProjectDao{
             session.close();
         } catch (HibernateException e) {
             if (transaction != null) {
+                logger.error("Update description transaction failed, rollback.");
                 transaction.rollback();
             }
-            logger.error("Failed to update project description for ${}", id, e);
+            logger.error("Failed to update project description for {}", id, e);
             throw e;
         }
     }
 
     @Override
     public void updateManager(long id, String manager) {
+        logger.info("Start to update project manager in postgres via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE Project as pr set pr.manager = :manager WHERE pr.project_id = :id";
+        String hql = "UPDATE Project as pr set pr.manager = :manager WHERE pr.projectId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
@@ -108,17 +115,19 @@ public class ProjectHibernateDao implements IProjectDao{
             session.close();
         } catch (HibernateException e) {
             if (transaction != null) {
+                logger.error("Update manager transaction failed, rollback.");
                 transaction.rollback();
             }
-            logger.error("Failed to update project manager for ${}", id, e);
+            logger.error("Failed to update project manager for {}", id, e);
             throw e;
         }
     }
 
     @Override
     public void delete(long id) {
+        logger.info("Start to delete project description in postgres via HibernateDao");
         Transaction transaction = null;
-        String hql = "delete Project as pr where pr.project_id = :Id";
+        String hql = "delete Project as pr where pr.projectId = :Id";
 
         try {
             Session session = sessionFactory.openSession();
@@ -130,9 +139,10 @@ public class ProjectHibernateDao implements IProjectDao{
             session.close();
         } catch (HibernateException e) {
             if(transaction != null) {
+                logger.error("Delete transaction failed, rollback.");
                 transaction.rollback();
             }
-            logger.error("Unable to delete project id = ${}", id, e);
+            logger.error("Unable to delete project id = {}", id, e);
             throw e;
         }
 

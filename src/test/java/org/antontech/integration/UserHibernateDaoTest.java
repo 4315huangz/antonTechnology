@@ -45,38 +45,32 @@ public class UserHibernateDaoTest {
 
     @Test
     public void updateCompanyNameTest(){
-        //Define Test Values
-        long userId = 3;
-        String newCompanyName = "EDF.INC";
+        long userId = user.getUserId();
+        String newCompanyName = "Updated Company Name";
         String originalName = userHibernateDao.getById(userId).getCompanyName();
         userHibernateDao.updateCompanyName(userId, newCompanyName);
         String updatedName = userHibernateDao.getById(userId).getCompanyName();
-
         assertEquals(newCompanyName, updatedName);
 
-        //reset the user's company name to its original name
         userHibernateDao.updateCompanyName(userId, originalName);
     }
 
     @Test
     public void updateAddressTest(){
-        //Define Test Values
-        long userId = 3;
-        String newAddress = "CN";
+        long userId = user.getUserId();
+        String newAddress = "Updated Address";
         String originalAddress = userHibernateDao.getById(userId).getAddress();
         userHibernateDao.updateAddress(userId, newAddress);
         String updatedAddress = userHibernateDao.getById(userId).getAddress();
 
         assertEquals(newAddress, updatedAddress);
 
-        //reset the user's company name to its original name
         userHibernateDao.updateAddress(userId, originalAddress);
     }
 
     @Test
     public void updateIndustryTest(){
-        //Define Test Values
-        long userId = 3;
+        long userId = user.getUserId();
         String newIndustry = "Grocery";
         String originalIndustry = userHibernateDao.getById(userId).getIndustry();
         userHibernateDao.updateIndustry(userId, newIndustry);
@@ -84,34 +78,28 @@ public class UserHibernateDaoTest {
 
         assertEquals(newIndustry, updatedIndustry);
 
-        //reset the user's company name to its original name
         userHibernateDao.updateIndustry(userId, originalIndustry);
     }
 
     @Test
     public  void updateManagerTest(){
-        long userId = 3;
-        User user;
-        //Get original parameters
-        user = userHibernateDao.getById(userId);
+        long userId = user.getUserId();
         String originalManager = user.getManagerName();
         String originalTitle = user.getTitle();
         String originalEmail = user.getEmail();
         String originalPhone = user.getPhone();
 
-        //Set new parameters
-        String newManager = "testManager";
-        String newTitle = "testTitle";
-        String newEmail = "test@test.com";
-        String newPhone = "testPhone";
+        String newManager = "updated manager";
+        String newTitle = "updated title";
+        String newEmail = "updateemail@test.com";
+        String newPhone = "updated phone";
         userHibernateDao.updateManager(userId, newManager, newTitle, newEmail, newPhone);
 
-        //get new pamaneters
-        user = userHibernateDao.getById(userId);
-        String updatedManager = user.getManagerName();
-        String updatedTitle = user.getTitle();
-        String updatedEmail = user.getEmail();
-        String updatedPhone = user.getPhone();
+        User newuser = userHibernateDao.getById(userId);
+        String updatedManager = newuser.getManagerName();
+        String updatedTitle = newuser.getTitle();
+        String updatedEmail = newuser.getEmail();
+        String updatedPhone = newuser.getPhone();
 
         assertEquals(newManager, updatedManager);
         assertEquals(newTitle, updatedTitle);

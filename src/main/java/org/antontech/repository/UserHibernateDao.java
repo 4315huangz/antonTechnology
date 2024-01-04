@@ -20,6 +20,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public List<User> getUsers() throws SQLException {
+        logger.info("Start to getUsers from postgres via HibernateDao");
         List<User> users;
         String hql = "From User";
         try {
@@ -36,6 +37,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public boolean save(User user) {
+        logger.info("Start to create user via HibernateDao");
         Transaction transaction = null;
         try {
             Session session = sessionFactory.openSession();
@@ -56,8 +58,9 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public User getById(long id) {
-        User user;
-        String hql = "From User as u WHERE u.user_id = :id";
+        logger.info("Start to get userById via HibernateDao");
+        User user=null;
+        String hql = "From User as u WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             Query<User> query = session.createQuery(hql);
@@ -66,13 +69,14 @@ public class UserHibernateDao implements IUserDao {
             session.close();
             return  user;
         } catch (HibernateException e) {
-            logger.error("Unable to get user by user_id = ${}", id, e);
+            logger.error("Unable to get user by user_id = {}", id, e);
             throw e;
         }
     }
 
     @Override
     public List<User> getUsersByIndustry(String industry) {
+        logger.info("Start to get userByIndustry via HibernateDao");
         List<User> users;
         String hql = "From User as u WHERE u.industry = :industry";
         try {
@@ -83,15 +87,16 @@ public class UserHibernateDao implements IUserDao {
             session.close();
             return  users;
         } catch (HibernateException e) {
-            logger.error("Unable to get users by industry = ${}", industry, e);
+            logger.error("Unable to get users by industry = {}", industry, e);
             throw e;
         }
     }
 
     @Override
     public void updateCompanyName(long id, String name) {
+        logger.info("Start to update user company name via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE User as u set u.company_name = :name WHERE u.user_id = :id";
+        String hql = "UPDATE User as u set u.companyName = :name WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
@@ -105,15 +110,16 @@ public class UserHibernateDao implements IUserDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Failed to update user company_name for ${}", id, e);
+            logger.error("Failed to update user company_name for {}", id, e);
             throw e;
         }
     }
 
     @Override
     public void updateAddress(long id, String address) {
+        logger.info("Start to update user address via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE User as u set u.address = :address WHERE u.user_id = :id";
+        String hql = "UPDATE User as u set u.address = :address WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
@@ -127,15 +133,16 @@ public class UserHibernateDao implements IUserDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Failed to update user address for ${}", id, e);
+            logger.error("Failed to update user address for {}", id, e);
             throw e;
         }
     }
 
     @Override
     public void updateIndustry(long id, String industry) {
+        logger.info("Start to update user industry via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE User as u set u.industry = :industry WHERE u.user_id = :id";
+        String hql = "UPDATE User as u set u.industry = :industry WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
@@ -149,7 +156,7 @@ public class UserHibernateDao implements IUserDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Failed to update user industry for ${}", id, e);
+            logger.error("Failed to update user industry for {}", id, e);
             throw e;
         }
 
@@ -157,9 +164,10 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public void updateManager(long id, String manager, String title, String email, String phone) {
+        logger.info("Start to update user manager via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE User as u set u.manager_name = :manager, u.title= :title," +
-                "u.email=:email, u.phone = :phone WHERE u.user_id = :id";
+        String hql = "UPDATE User as u set u.managerName = :manager, u.title= :title," +
+                "u.email=:email, u.phone = :phone WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
@@ -183,13 +191,14 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public void delete(long id) {
+        logger.info("Start to delete user via HibernateDao");
         Transaction transaction = null;
-        String hql = "delete User as u where u.user_id = :Id";
+        String hql = "delete from User as u where u.userId = :Id";
 
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
-            Query<Product> query = session.createQuery(hql);
+            Query<User> query = session.createQuery(hql);
             query.setParameter("Id", id);
             query.executeUpdate();
             transaction.commit();
@@ -198,9 +207,8 @@ public class UserHibernateDao implements IUserDao {
             if(transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Unable to delete user id = ${}", id, e);
+            logger.error("Unable to delete user id = {}", id, e);
             throw e;
         }
-
     }
 }

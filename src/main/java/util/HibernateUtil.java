@@ -18,6 +18,7 @@ public class HibernateUtil {
     private static final Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
 
     public static SessionFactory getSessionFactory() {
+        logger.info("Start create session factory");
         if (sessionFactory == null) {
             try {
                 String[] modelPackages = {"org.antontech.model"};
@@ -45,6 +46,7 @@ public class HibernateUtil {
                 sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             } catch (HibernateException e) {
                 logger.error("Unable to create sessionFactory", e);
+                throw e;
             }
         }
         return sessionFactory;

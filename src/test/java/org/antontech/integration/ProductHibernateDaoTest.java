@@ -27,6 +27,7 @@ public class ProductHibernateDaoTest {
         productHibernateDao = new ProductHibernateDao();
         userHibernateDao = new UserHibernateDao();
         product = new Product();
+
         user = new User();
         user.setTitle("test title");
         user.setEmail("test email");
@@ -53,31 +54,38 @@ public class ProductHibernateDaoTest {
 
     @Test
     public void getProductsTest() throws SQLException {
-        List<Product> productList = productHibernateDao.getProducts();
-        assertEquals(2, productList.size());
+        List<User> userList = userHibernateDao.getUsers();
+        assertEquals(3, userList.size());
     }
 
     @Test
     public void updateNameTest() {
-        // Define test values
-        int productId = 1;
+        long productId = product.getId();
         String newName = "Updated Product Name";
 
-        //retrieve original name
-        Product product = productHibernateDao.getById(productId);
         String originalProductName = product.getName();
 
-        //retrieve updated name
         productHibernateDao.updateName(productId,newName);
         String updatedProductName = productHibernateDao.getById(productId).getName();
 
         assertEquals(newName, updatedProductName);
 
-        //reset the product name to its original name
         productHibernateDao.updateName(productId, originalProductName);
+    }
 
+    @Test
+    public void updateDescriptionTest() {
+        long productId = product.getId();
+        String newDescription = "Updated Product Description";
 
+        String originalProductDesc = product.getDescription();
 
+        productHibernateDao.updateDescription(productId,newDescription);
+        String updatedProductDesc = productHibernateDao.getById(productId).getDescription();
+
+        assertEquals(newDescription, updatedProductDesc);
+
+        productHibernateDao.updateDescription(productId, originalProductDesc);
     }
 
 
