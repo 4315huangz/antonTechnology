@@ -29,6 +29,8 @@ public class Product {
 
     public Product() {
     }
+    public Product(long id, String name, String description) {
+    }
 
     public long getId() {
         return id;

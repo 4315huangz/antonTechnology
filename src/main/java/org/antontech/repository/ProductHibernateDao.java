@@ -14,10 +14,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ProductHibernateDao implements IProductDao {
-    private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-    private final Logger log = LoggerFactory.getLogger(ProductHibernateDao.class);
+    private static final Logger log = LoggerFactory.getLogger(ProductHibernateDao.class);
     @Override
-    public List<Product> getProducts() throws SQLException {
+    public List<Product> getProducts()  {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         log.info("Start to getProducts from postgres via HibernateDao");
         List<Product> products;
         try {
@@ -35,6 +35,7 @@ public class ProductHibernateDao implements IProductDao {
 
     @Override
     public Product getById(long id)  {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         log.info("Start to getProductById from postgres via HibernateDao");
         String hql = "FROM Product P WHERE P.id = :Id";
         Product product = null;
@@ -53,6 +54,7 @@ public class ProductHibernateDao implements IProductDao {
 
     @Override
     public boolean save(Product product) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         log.info("Start to save product in postgres via HibernateDao");
         Transaction transaction = null;
         try {
@@ -74,6 +76,7 @@ public class ProductHibernateDao implements IProductDao {
 
     @Override
     public void updateName(long id, String name) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         log.info("Start to update product name in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE Product as p set p.name = :name WHERE p.id = :id";
@@ -98,6 +101,7 @@ public class ProductHibernateDao implements IProductDao {
 
     @Override
     public void updateDescription(long id, String description) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         log.info("Start to update product description in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE Product as p set p.description = :description WHERE p.id = :id";
@@ -123,6 +127,7 @@ public class ProductHibernateDao implements IProductDao {
 
     @Override
     public void delete(long id) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         log.info("Start to delete product in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "delete Product as p where p.id = :Id";
