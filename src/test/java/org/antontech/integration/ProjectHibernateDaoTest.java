@@ -1,12 +1,17 @@
 package org.antontech.integration;
 
 import junit.framework.Assert;
+import org.antontech.ApplicationBootstrap;
 import org.antontech.model.Project;
 import org.antontech.model.User;
 import org.antontech.repository.ProjectHibernateDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -14,13 +19,15 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ApplicationBootstrap.class)
 public class ProjectHibernateDaoTest {
+    @Autowired
     ProjectHibernateDao projectHibernateDao;
     Project project;
 
     @Before
     public void setup(){
-        projectHibernateDao = new ProjectHibernateDao();
         project = new Project();
         project.setOem(3);
         project.setSupplier(16);
@@ -63,7 +70,5 @@ public class ProjectHibernateDaoTest {
        Assert.assertEquals(newManager, updatedManager);
 
        projectHibernateDao.updateManager(projectId, originalManager);
-
-
     }
 }

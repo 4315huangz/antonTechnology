@@ -8,11 +8,13 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Repository;
 import util.HibernateUtil;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Repository
 public class ProductHibernateDao implements IProductDao {
     private static final Logger log = LoggerFactory.getLogger(ProductHibernateDao.class);
     @Override

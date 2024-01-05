@@ -1,5 +1,6 @@
 package org.antontech.integration;
 
+import org.antontech.ApplicationBootstrap;
 import org.antontech.model.Product;
 import org.antontech.model.User;
 import org.antontech.repository.IProductDao;
@@ -9,25 +10,30 @@ import org.antontech.repository.UserHibernateDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 
 import java.sql.SQLException;
 import java.util.List;
 import static junit.framework.Assert.assertEquals;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ApplicationBootstrap.class)
 public class ProductHibernateDaoTest {
-    IProductDao productHibernateDao;
-    IUserDao userHibernateDao;
+    @Autowired
+    private IProductDao productHibernateDao;
+    @Autowired
+    private IUserDao userHibernateDao;
 
     Product product;
     User user;
 
     @Before
     public void setup(){
-        productHibernateDao = new ProductHibernateDao();
-        userHibernateDao = new UserHibernateDao();
         product = new Product();
-
         user = new User();
         user.setTitle("test title");
         user.setEmail("test email");
@@ -38,7 +44,6 @@ public class ProductHibernateDaoTest {
         user.setManagerName("test manager");
         user.setCompanyName("test company");
         userHibernateDao.save(user);
-
 
         product.setName("TestProduct");
         product.setDescription("Test description");
@@ -87,7 +92,4 @@ public class ProductHibernateDaoTest {
 
         productHibernateDao.updateDescription(productId, originalProductDesc);
     }
-
-
-
 }

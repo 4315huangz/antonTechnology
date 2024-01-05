@@ -78,8 +78,6 @@ public class ProductHibernateDaoTest {
             doNothing().when(mockSession).close();
             boolean res = productDao.save(product);
             assertTrue(res);
-
         }
-
     }
 }

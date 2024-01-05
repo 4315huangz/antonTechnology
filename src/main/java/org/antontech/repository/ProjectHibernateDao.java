@@ -9,12 +9,13 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Repository;
 import util.HibernateUtil;
 
 import java.sql.SQLException;
 import java.util.List;
 
-
+@Repository
 public class ProjectHibernateDao implements IProjectDao{
     private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
     private final Logger logger = LoggerFactory.getLogger(ProjectHibernateDao.class);

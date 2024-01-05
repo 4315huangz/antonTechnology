@@ -1,24 +1,31 @@
 package org.antontech.integration;
 
+import org.antontech.ApplicationBootstrap;
 import org.antontech.model.Product;
 import org.antontech.model.User;
 import org.antontech.repository.UserHibernateDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.sql.SQLException;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ApplicationBootstrap.class)
 public class UserHibernateDaoTest {
+    @Autowired
     UserHibernateDao userHibernateDao;
     User user = new User();
 
     @Before
     public void setup() {
-        userHibernateDao = new UserHibernateDao();
         user.setCompanyName("ABC.INC");
         user.setAddress("US");
         user.setIndustry("Electricity");
