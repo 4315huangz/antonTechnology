@@ -142,4 +142,49 @@ public class ProductJDBCDao implements IProductDao {
         }
     }
 
+    @Override
+    public List<Product> searchByDescriptionKeyword(String keyword) {
+        log.info("Start to search Product through description from postgres via JDBC");
+
+        List<Product> products = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        log.debug("setup required attributes");
+
+        try {
+            con = DriverManager.getConnection(DB_URL, USER, PASS);
+            String sql = "SELECT * FROM products WHERE LOWER(description) LIKE ?";
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1,"%" + keyword.toLowerCase() + "%");
+            rs = stmt.executeQuery();
+            log.info("Connects to DB and execute the select query");
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String description = rs.getString("description");
+                log.info("Get all product attributes and translate to java object " + id);
+
+                Product product = new Product();
+                product.setId(id);
+                product.setName(name);
+                product.setDescription(description);
+                products.add(product);
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute select query", e);
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(stmt != null) stmt.close();
+                if(rs != null) rs.close();
+                if(con != null) con.close();
+            } catch (SQLException e) {
+                log.error("Unable to close the JDBC Connection",e);
+            }
+        }
+        return products;
+    }
+
 }

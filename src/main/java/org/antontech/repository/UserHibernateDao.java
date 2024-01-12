@@ -21,13 +21,49 @@ public class UserHibernateDao implements IUserDao {
     private final Logger logger = LoggerFactory.getLogger(UserHibernateDao.class);
 
     @Override
-    public List<User> getUsers() throws SQLException {
+    public List<User> getUsers() {
         logger.info("Start to getUsers from postgres via HibernateDao");
         List<User> users;
         String hql = "From User";
         try {
             Session session = sessionFactory.openSession();
             Query<User> query = session.createQuery(hql);
+            users = query.list();
+            session.close();
+            return users;
+        } catch (HibernateException e) {
+            logger.error("Open session exception or close session exception", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<User> getSuppliers() {
+        logger.info("Start to getSuppliers from postgres via HibernateDao");
+        List<User> users;
+        String hql = "From User u WHERE u.type = :userType ";
+        try {
+            Session session = sessionFactory.openSession();
+            Query<User> query = session.createQuery(hql);
+            query.setParameter("userType", "Supplier");
+            users = query.list();
+            session.close();
+            return users;
+        } catch (HibernateException e) {
+            logger.error("Open session exception or close session exception", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<User> getOEMs() {
+        logger.info("Start to getOEMs from postgres via HibernateDao");
+        List<User> users;
+        String hql = "From User u WHERE u.type = :userType ";
+        try {
+            Session session = sessionFactory.openSession();
+            Query<User> query = session.createQuery(hql);
+            query.setParameter("userType", "OEM");
             users = query.list();
             session.close();
             return users;

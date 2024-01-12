@@ -58,7 +58,7 @@ public class ProductHibernateDaoTest {
     }
 
     @Test
-    public void getProductsTest() throws SQLException {
+    public void getProductsTest() {
         List<User> userList = userHibernateDao.getUsers();
         assertEquals(3, userList.size());
     }
@@ -91,5 +91,11 @@ public class ProductHibernateDaoTest {
         assertEquals(newDescription, updatedProductDesc);
 
         productHibernateDao.updateDescription(productId, originalProductDesc);
+    }
+
+    @Test
+    public void searchByDescriptionKeywordTest() {
+        List<Product> productList = productHibernateDao.searchByDescriptionKeyword("Test");
+        assertEquals(2, productList.size());
     }
 }

@@ -7,7 +7,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface IProjectDao {
-    List<Project> getProjects() throws SQLException;
+    List<Project> getProjects();
+
+    List<Project> getProjectsByOEM(long id);
+
+    List<Project> getProjectsBySupplier(long id);
 
     boolean save(Project project);
 

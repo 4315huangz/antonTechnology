@@ -7,7 +7,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface IUserDao {
-    List<User> getUsers() throws SQLException;
+    List<User> getUsers();
+
+    List<User> getSuppliers();
+
+    List<User> getOEMs();
 
     boolean save(User user);
 

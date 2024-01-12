@@ -66,6 +66,16 @@ public class ProjectJDBCDao implements IProjectDao {
     }
 
     @Override
+    public List<Project> getProjectsByOEM(long id) {
+        return null;
+    }
+
+    @Override
+    public List<Project> getProjectsBySupplier(long id) {
+        return null;
+    }
+
+    @Override
     public boolean save(Project project) {
         log.info("Start to create Project in postgres via JDBC");
         Connection con = null;

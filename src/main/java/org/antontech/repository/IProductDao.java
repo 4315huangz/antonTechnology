@@ -17,4 +17,6 @@ public interface IProductDao {
     void updateDescription(long id, String description);
 
     void delete(long id);
+
+    List<Product> searchByDescriptionKeyword(String keyword);
 }

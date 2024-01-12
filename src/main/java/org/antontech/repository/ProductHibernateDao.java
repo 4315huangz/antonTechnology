@@ -1,17 +1,14 @@
 package org.antontech.repository;
 
 import org.antontech.model.Product;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.query.Query;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Repository;
 import util.HibernateUtil;
 
-import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -148,6 +145,28 @@ public class ProductHibernateDao implements IProductDao {
                 transaction.rollback();
             }
             log.error("Unable to delete product id = {}", id, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<Product> searchByDescriptionKeyword(String keyword) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        log.info("Start to search product by keyword in postgres via HibernateDao");
+        String hql = "FROM Product P WHERE lower(P.description) LIKE lower(:keyword)";
+        List<Product> products=null;
+        try {
+            Session session = sessionFactory.openSession();
+            Query<Product> query = session.createQuery(hql);
+            query.setParameter("keyword", "%" + keyword + "%");
+            products = query.getResultList();
+            session.close();
+            return products;
+        } catch (ObjectNotFoundException ex) {
+            log.error("A User entity referenced by a product was not found.");
+            return products;
+        } catch (HibernateException e) {
+            log.error("Unable to search products by keyword = {}", keyword, e);
             throw e;
         }
     }

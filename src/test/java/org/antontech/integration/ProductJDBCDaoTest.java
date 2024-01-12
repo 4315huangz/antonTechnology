@@ -32,5 +32,11 @@ public class ProductJDBCDaoTest {
         assertEquals(2, productList.size());
     }
 
+    @Test
+    public void searchByDescriptionKeywordTest() {
+        List<Product> productList = productJDBCDao.searchByDescriptionKeyword("Test");
+        assertEquals(2, productList.size());
+
+    }
 
 }

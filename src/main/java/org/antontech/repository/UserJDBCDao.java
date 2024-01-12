@@ -71,6 +71,16 @@ public class UserJDBCDao implements IUserDao{
     }
 
     @Override
+    public List<User> getSuppliers() {
+        return null;
+    }
+
+    @Override
+    public List<User> getOEMs() {
+        return null;
+    }
+
+    @Override
     public boolean save(User user) {
         log.info("Start to create user in postgres via JDBC");
         Connection con = null;
