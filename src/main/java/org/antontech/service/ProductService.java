@@ -1,5 +1,6 @@
 package org.antontech.service;
 
+import org.antontech.controller.ProductController;
 import org.antontech.model.Product;
 import org.antontech.model.User;
 import org.antontech.repository.IProductDao;
@@ -13,9 +14,14 @@ import java.util.List;
 
 @Service
 public class ProductService {
-    private final Logger logger = LoggerFactory.getLogger(ProductService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
     @Autowired
     private IProductDao productDao;
+
+    public List<Product> getProducts () {
+        return productDao.getProducts();
+    }
 
     public List<Product> getProductsByOEM (User user) {
         if("OEM".equals(user.getType())) {

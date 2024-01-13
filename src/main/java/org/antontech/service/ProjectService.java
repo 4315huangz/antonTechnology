@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/*
+
 @Service
 public class ProjectService {
     @Autowired
@@ -41,4 +41,4 @@ public class ProjectService {
         projectDao.delete(id);
     }
 }
- */
+

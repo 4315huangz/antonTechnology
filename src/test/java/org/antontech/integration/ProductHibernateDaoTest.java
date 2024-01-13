@@ -60,7 +60,7 @@ public class ProductHibernateDaoTest {
     @Test
     public void getProductsTest() {
         List<User> userList = userHibernateDao.getUsers();
-        assertEquals(3, userList.size());
+        assertEquals(4, userList.size());
     }
 
     @Test
