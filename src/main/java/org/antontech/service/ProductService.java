@@ -13,13 +13,11 @@ import java.util.List;
 
 @Service
 public class ProductService {
-    private Logger logger = LoggerFactory.getLogger(ProductService.class);
+    private final Logger logger = LoggerFactory.getLogger(ProductService.class);
     @Autowired
     private IProductDao productDao;
-    @Autowired
-    private IUserDao userDao;
 
-    public List<Product> getAProductsbyOEM (User user) {
+    public List<Product> getProductsByOEM (User user) {
         if("OEM".equals(user.getType())) {
             return productDao.getProducts();
         } else {
@@ -46,7 +44,7 @@ public class ProductService {
         }
     }
 
-    public void saveProductsbySupplier(User user, Product product) {
+    public void saveProductsBySupplier(User user, Product product) {
         if("Supplier".equals(user.getType())) {
             productDao.save(product);
         } else {
@@ -77,7 +75,4 @@ public class ProductService {
             logger.warn("Unexpected user type: {}", user.getType());
         }
     }
-
-
-
 }

@@ -17,11 +17,11 @@ import java.util.List;
 
 @Repository
 public class UserHibernateDao implements IUserDao {
-    private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
     private final Logger logger = LoggerFactory.getLogger(UserHibernateDao.class);
 
     @Override
     public List<User> getUsers() {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to getUsers from postgres via HibernateDao");
         List<User> users;
         String hql = "From User";
@@ -39,6 +39,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public List<User> getSuppliers() {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to getSuppliers from postgres via HibernateDao");
         List<User> users;
         String hql = "From User u WHERE u.type = :userType ";
@@ -57,6 +58,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public List<User> getOEMs() {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to getOEMs from postgres via HibernateDao");
         List<User> users;
         String hql = "From User u WHERE u.type = :userType ";
@@ -75,6 +77,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public boolean save(User user) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to create user via HibernateDao");
         Transaction transaction = null;
         try {
@@ -96,6 +99,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public User getById(long id) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to get userById via HibernateDao");
         User user=null;
         String hql = "From User as u WHERE u.userId = :id";
@@ -114,6 +118,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public List<User> getUsersByIndustry(String industry) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to get userByIndustry via HibernateDao");
         List<User> users;
         String hql = "From User as u WHERE u.industry = :industry";
@@ -132,6 +137,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public void updateCompanyName(long id, String name) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update user company name via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE User as u set u.companyName = :name WHERE u.userId = :id";
@@ -155,6 +161,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public void updateAddress(long id, String address) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update user address via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE User as u set u.address = :address WHERE u.userId = :id";
@@ -178,6 +185,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public void updateIndustry(long id, String industry) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update user industry via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE User as u set u.industry = :industry WHERE u.userId = :id";
@@ -202,6 +210,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public void updateManager(long id, String manager, String title, String email, String phone) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update user manager via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE User as u set u.managerName = :manager, u.title= :title," +
@@ -229,6 +238,7 @@ public class UserHibernateDao implements IUserDao {
 
     @Override
     public void delete(long id) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to delete user via HibernateDao");
         Transaction transaction = null;
         String hql = "delete from User as u where u.userId = :Id";

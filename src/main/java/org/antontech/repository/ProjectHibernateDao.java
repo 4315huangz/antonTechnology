@@ -17,11 +17,11 @@ import java.util.List;
 
 @Repository
 public class ProjectHibernateDao implements IProjectDao{
-    private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
     private final Logger logger = LoggerFactory.getLogger(ProjectHibernateDao.class);
 
     @Override
     public List<Project> getProjects() {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to getProjects from postgres via HibernateDao");
         List<Project> projects;
         try {
@@ -39,6 +39,7 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public List<Project> getProjectsByOEM(long oemId) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to getProjectsByOEM from postgres via HibernateDao");
         String hql = "FROM Project Pr WHERE Pr.oem = :OEMId";
         List<Project> projects = null;
@@ -57,6 +58,7 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public List<Project> getProjectsBySupplier(long supplierId) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to getProjectsBySupplier from postgres via HibernateDao");
         String hql = "FROM Project Pr WHERE Pr.supplier = :SupId";
         List<Project> projects = null;
@@ -75,6 +77,7 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public boolean save(Project project) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to save project in postgres via HibernateDao");
         Transaction transaction = null;
         try {
@@ -96,6 +99,7 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public Project getById(long id) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to get projectById in postgres via HibernateDao");
         String hql = "FROM Project Pr WHERE Pr.projectId = :Id";
         Project project = null;
@@ -114,6 +118,7 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public void updateDescription(long id, String description) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update project description in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE Project as pr set pr.description = :description WHERE pr.projectId = :id";
@@ -138,6 +143,7 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public void updateManager(long id, String manager) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update project manager in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE Project as pr set pr.manager = :manager WHERE pr.projectId = :id";
@@ -162,6 +168,7 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public void delete(long id) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to delete project description in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "delete Project as pr where pr.projectId = :Id";
@@ -182,6 +189,5 @@ public class ProjectHibernateDao implements IProjectDao{
             logger.error("Unable to delete project id = {}", id, e);
             throw e;
         }
-
     }
 }

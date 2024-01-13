@@ -11,13 +11,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/*
 @Service
 public class ProjectService {
     @Autowired
     private IProjectDao projectDao;
-
-    @Autowired
-    private IUserDao userDao;
 
     public List<Project> getProjects(User user) {
         if("OEM".equals(user.getType())) {
@@ -43,3 +41,4 @@ public class ProjectService {
         projectDao.delete(id);
     }
 }
+ */
