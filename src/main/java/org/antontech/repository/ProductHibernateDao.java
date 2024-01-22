@@ -1,19 +1,25 @@
 package org.antontech.repository;
 
 import org.antontech.model.Product;
-import org.hibernate.*;
+
+import org.hibernate.HibernateException;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Repository;
 import util.HibernateUtil;
 
-import java.util.Collections;
+
 import java.util.List;
 
 @Repository
 public class ProductHibernateDao implements IProductDao {
     private static final Logger log = LoggerFactory.getLogger(ProductHibernateDao.class);
+
     @Override
     public List<Product> getProducts()  {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();

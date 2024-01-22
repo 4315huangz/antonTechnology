@@ -13,10 +13,12 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.security.Signature;
+import java.util.Calendar;
 import java.util.Date;
 
 @Service
 public class JWTService {
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private final String SECRET_KEY = "ziwei-ascending";
     private final String ISSUER = "com.antontechnology";
     private final long EXPIRATION_TIME = 86400 * 1000;
@@ -36,5 +38,13 @@ public class JWTService {
         JwtBuilder builder = Jwts.builder().setClaims(claims).signWith(signatureAlgorithm,signingKey);
         String generatedToken = builder.compact();
         return generatedToken;
+    }
+
+    public Claims decryptToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
+                .parseClaimsJws(token).getBody();
+        logger.debug("Claims: {}", claims.toString());
+        return claims;
     }
 }

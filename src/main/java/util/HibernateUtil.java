@@ -9,9 +9,10 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
+
 
 import java.util.Properties;
-
 
 public class HibernateUtil {
     private static SessionFactory sessionFactory;
