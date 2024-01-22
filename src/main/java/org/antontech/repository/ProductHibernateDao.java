@@ -156,7 +156,7 @@ public class ProductHibernateDao implements IProductDao {
     }
 
     @Override
-    public List<Product> searchByDescriptionKeyword(String keyword) {
+    public List<Product> searchByDescription(String keyword) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         log.info("Start to search product by keyword in postgres via HibernateDao");
         String hql = "FROM Product P WHERE lower(P.description) LIKE lower(:keyword)";

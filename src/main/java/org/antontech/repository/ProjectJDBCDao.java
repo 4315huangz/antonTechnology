@@ -1,13 +1,17 @@
 package org.antontech.repository;
-
-import org.antontech.model.Product;
 import org.antontech.model.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 public class ProjectJDBCDao implements IProjectDao {
     private static final String DB_URL = "jdbc:postgresql://localhost:5430/antontech_db";
@@ -18,7 +22,6 @@ public class ProjectJDBCDao implements IProjectDao {
     @Override
     public List<Project> getProjects() {
         log.info("Start to getProject from postgres via JDBC");
-
         List<Project> projects = new ArrayList<>();
         Connection con = null;
         Statement stmt = null;
@@ -30,12 +33,10 @@ public class ProjectJDBCDao implements IProjectDao {
             String sql = "SELECT * FROM projects";
             stmt = con.createStatement();
             rs = stmt.executeQuery(sql);
-            log.info("Connects to DB and execute the query");
+            log.info("Connects to DB and execute the select projects query");
 
             while (rs.next()) {
                 int project_id = rs.getInt("project_id");
-                int oem = rs.getInt("oem");
-                int supplier = rs.getInt("supplier");
                 Date start_date = rs.getDate("start_date");
                 String description = rs.getString("description");
                 String manager = rs.getString("manager");
@@ -43,8 +44,6 @@ public class ProjectJDBCDao implements IProjectDao {
 
                 Project project = new Project();
                 project.setProjectId(project_id);
-                project.setOem(oem);
-                project.setSupplier(supplier);
                 project.setStartDate(start_date);
                 project.setDescription(description);
                 project.setManager(manager);
@@ -59,21 +58,12 @@ public class ProjectJDBCDao implements IProjectDao {
                 if(rs != null) rs.close();
                 if(con != null) con.close();
             } catch (SQLException e) {
-
+                log.error("Unable to close the JDBC Connection",e);
             }
         }
         return projects;
     }
 
-    @Override
-    public List<Project> getProjectsByOEM(long id) {
-        return null;
-    }
-
-    @Override
-    public List<Project> getProjectsBySupplier(long id) {
-        return null;
-    }
 
     @Override
     public boolean save(Project project) {
@@ -85,16 +75,14 @@ public class ProjectJDBCDao implements IProjectDao {
 
         try {
             con = DriverManager.getConnection(DB_URL, USER, PASS);
-            String sql = "INSERT INTO projects (oem, supplier, start_date, description, manager) VALUES (?,?,?,?,?)";
+            String sql = "INSERT INTO projects (start_date, description, manager) VALUES (?,?,?)";
             stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             log.info("Connects to DB and execute the insert query");
-            stmt.setLong(1, project.getOem());
-            stmt.setLong(2, project.getSupplier());
             java.util.Date utilDate = project.getStartDate();
             java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-            stmt.setDate(3, sqlDate );
-            stmt.setString(4, project.getDescription());
-            stmt.setString(5, project.getManager());
+            stmt.setDate(1, sqlDate );
+            stmt.setString(2, project.getDescription());
+            stmt.setString(3, project.getManager());
             stmt.executeUpdate();
 
             rs = stmt.getGeneratedKeys();

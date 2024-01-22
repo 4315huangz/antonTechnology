@@ -17,7 +17,6 @@ public class ProductJDBCDao implements IProductDao {
 
     public List<Product> getProducts() {
         log.info("Start to getProducts from postgres via JDBC");
-
         List<Product> products = new ArrayList<>();
         Connection con = null;
         Statement stmt = null;
@@ -32,7 +31,7 @@ public class ProductJDBCDao implements IProductDao {
             log.info("Connects to DB and execute the select query");
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int id = rs.getInt("product_id");
                 String name = rs.getString("name");
                 String description = rs.getString("description");
                 log.info("Get all product attributes and translate to java object " + id);
@@ -73,7 +72,7 @@ public class ProductJDBCDao implements IProductDao {
             log.info("Connects to DB and execute the insert query");
             stmt.setString(1, product.getName());
             stmt.setString(2, product.getDescription());
-            stmt.setLong(3,0);
+            stmt.setLong(3, product.getUser().getUserId());
             stmt.executeUpdate();
 
             rs = stmt.getGeneratedKeys();
@@ -121,7 +120,7 @@ public class ProductJDBCDao implements IProductDao {
 
         try {
             con = DriverManager.getConnection(DB_URL, USER, PASS);
-            String sql = "DELETE FROM products WHERE id = ?";
+            String sql = "DELETE FROM products WHERE product_id = ?";
             ps = con.prepareStatement(sql);
             log.info("Connects to DB and execute the delete query");
             ps.setLong(1, id);
@@ -143,7 +142,7 @@ public class ProductJDBCDao implements IProductDao {
     }
 
     @Override
-    public List<Product> searchByDescriptionKeyword(String keyword) {
+    public List<Product> searchByDescription(String keyword) {
         log.info("Start to search Product through description from postgres via JDBC");
 
         List<Product> products = new ArrayList<>();
@@ -161,7 +160,7 @@ public class ProductJDBCDao implements IProductDao {
             log.info("Connects to DB and execute the select query");
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int id = rs.getInt("product_id");
                 String name = rs.getString("name");
                 String description = rs.getString("description");
                 log.info("Get all product attributes and translate to java object " + id);

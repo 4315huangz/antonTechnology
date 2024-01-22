@@ -9,10 +9,6 @@ import java.util.List;
 public interface IProjectDao {
     List<Project> getProjects();
 
-    List<Project> getProjectsByOEM(long id);
-
-    List<Project> getProjectsBySupplier(long id);
-
     boolean save(Project project);
 
     Project getById(long id);

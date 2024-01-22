@@ -7,10 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Service
 public class UserService {
@@ -19,42 +17,35 @@ public class UserService {
     private Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public List<User> getUsers(User user) {
-        logger.info("Start to getUsers by UserService");
-        if("OEM".equals(user.getType())) {
-            return userDao.getSuppliers();
-        } else if ("Supplier".equals((user.getType()))) {
-            return userDao.getOEMs();
-        }
-        return List.of();
+        return userDao.getUsers();
     }
 
-
-    public List<User> getUsersByIndustry (User user, String industry) {
-        logger.info("Start to getUsersByIndustry by UserService");
-        List<User> users = getUsers(user);
-        return users.stream()
-                .filter(u -> userDao.getUsersByIndustry(industry).contains(u))
-                .collect(Collectors.toList());
+    public User getUserByCredentials(String email, String password) throws Exception {
+        return  userDao.getUserByCredentials(email, password);
     }
 
     public boolean save(User user) {
         return userDao.save(user);
     }
 
-    public void updateCompanyName(long id, String name) {
-        userDao.updateCompanyName(id, name);
+    public User getById(long id) { return userDao.getById(id); }
+
+    public void getByIndustry(String industry) {
+        userDao.getByIndustry(industry);
     }
 
-    public void updateAddress(long id, String address) {
-        userDao.updateAddress(id, address);
+    public void updateEmail(long id, String email) {
+        userDao.updateEmail(id, email);
     }
 
-    public void updateIndustry(long id, String industry) {
-        userDao.updateIndustry(id, industry);
+    public void updatePassword(long id, String password) {
+        userDao.updatePassword(id, password);
     }
 
-    public void updateManager(long id, String manager, String title, String email, String phone) {
-        userDao.updateManager(id, manager, title, email, phone);
+    public void updateCompany(long id, String companyName, String address, String industry) { userDao.updateCompany(id, companyName, address, industry); }
+
+    public void updateManager(long id, String firstName, String lastName, String title, String phone) {
+        userDao.updateManager(id, firstName, lastName, title, phone);
     }
 
     public void delete(long id) {

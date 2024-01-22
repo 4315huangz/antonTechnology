@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Repository;
 import util.HibernateUtil;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -33,44 +32,6 @@ public class ProjectHibernateDao implements IProjectDao{
             return projects;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception", e);
-            throw e;
-        }
-    }
-
-    @Override
-    public List<Project> getProjectsByOEM(long oemId) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        logger.info("Start to getProjectsByOEM from postgres via HibernateDao");
-        String hql = "FROM Project Pr WHERE Pr.oem = :OEMId";
-        List<Project> projects = null;
-        try {
-            Session session = sessionFactory.openSession();
-            Query<Project> query = session.createQuery(hql);
-            query.setParameter("OEMId", oemId);
-            projects = query.list();
-            session.close();
-            return projects;
-        } catch (HibernateException e) {
-            logger.error("Unable to get project by OEM id = {}", oemId, e);
-            throw e;
-        }
-    }
-
-    @Override
-    public List<Project> getProjectsBySupplier(long supplierId) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        logger.info("Start to getProjectsBySupplier from postgres via HibernateDao");
-        String hql = "FROM Project Pr WHERE Pr.supplier = :SupId";
-        List<Project> projects = null;
-        try {
-            Session session = sessionFactory.openSession();
-            Query<Project> query = session.createQuery(hql);
-            query.setParameter("SupId", supplierId);
-            projects = query.list();
-            session.close();
-            return projects;
-        } catch (HibernateException e) {
-            logger.error("Unable to get project by supplier id = {}", supplierId, e);
             throw e;
         }
     }

@@ -1,32 +1,27 @@
 package org.antontech.repository;
 
-import org.antontech.model.Product;
 import org.antontech.model.User;
-
-import java.sql.SQLException;
 import java.util.List;
 
 public interface IUserDao {
     List<User> getUsers();
 
-    List<User> getSuppliers();
-
-    List<User> getOEMs();
-
     boolean save(User user);
 
     User getById(long id);
 
-    List<User> getUsersByIndustry(String industry);
+    List<User> getByIndustry(String industry);
 
-    void updateCompanyName(long id, String name);
+    void updateEmail(long id, String email);
 
-    void updateAddress(long id, String address);
+    void updatePassword(long id, String password);
 
-    void updateIndustry(long id, String industry);
+    void updateCompany(long id, String companyName, String address, String industry);
 
-    void updateManager(long id, String manager, String title, String email, String phone);
+    void updateManager(long id, String firstName, String lastName, String title, String phone);
 
     void delete(long id);
+
+    User getUserByCredentials(String email, String password) throws Exception;
 
 }

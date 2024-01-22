@@ -2,11 +2,12 @@ package org.antontech.repository;
 
 import org.antontech.model.Product;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public interface IProductDao {
     List<Product> getProducts();
+
+    List<Product> searchByDescription(String keyword);
 
     boolean save(Product product);
 
@@ -18,5 +19,4 @@ public interface IProductDao {
 
     void delete(long id);
 
-    List<Product> searchByDescriptionKeyword(String keyword);
 }

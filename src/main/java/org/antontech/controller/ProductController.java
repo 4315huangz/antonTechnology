@@ -24,34 +24,22 @@ public class ProductController {
         return products;
     }
 
-    @RequestMapping(value = "/oem", method = RequestMethod.POST)
-    public List<Product> getProductsByOEM(@RequestBody User user) {
-        logger.info("Pass is variable user {}", user);
-        return productService.getProductsByOEM(user);
-    }
-
-    @RequestMapping(value = "/oem/{id}", method = RequestMethod.GET)
-    public Product getProductByIdByOEM(User user, @PathVariable long id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public Product getProductByIdByOEM( @PathVariable long id) {
         logger.info("I am in getProductByIdByOEM controller");
-        return productService.getProductByIdByOEM(user, id);
+        return productService.getById(id);
     }
 
-    @RequestMapping(value = "/oem/{keyword}", method = RequestMethod.GET)
-    public List<Product> searchProductsByOEM(User user, @PathVariable String keyword) {
+    @RequestMapping(value = "/{keyword}", method = RequestMethod.GET)
+    public List<Product> searchProductsByOEM(@PathVariable String keyword) {
         logger.info("I am in searchProductsByOEM controller");
-        return productService.searchProductsByOEM(user, keyword);
+        return productService.searchByDescription(keyword);
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public void saveProductsBySupplier(User user, Product product) {
+    public void saveProductsBySupplier( @RequestBody Product product) {
         logger.info("I am in saveProductsBySupplier controller");
-        productService.saveProductsBySupplier(user, product);
-    }
-
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
-    public void updateNameBySupplier(User user, @RequestParam(name = "id") long id, String name) {
-        logger.info("I am in updateNameBySupplier controller");
-        productService.updateNameBySupplier(user, id, name);
+        productService.save(product);
     }
 
 }

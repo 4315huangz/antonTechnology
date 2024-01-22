@@ -15,7 +15,7 @@ import javax.persistence.JoinColumn;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "product_id")
     private long id;
     @Column(name = "name")
     private String name;

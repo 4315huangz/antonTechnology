@@ -1,15 +1,12 @@
 package org.antontech.controller;
 
-import org.antontech.model.Account;
-import org.antontech.service.AccountService;
+import org.antontech.model.User;
 import org.antontech.service.JWTService;
-import org.apache.commons.codec.digest.DigestUtils;
+import org.antontech.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/auth")
@@ -17,19 +14,19 @@ public class AuthController {
     @Autowired
     JWTService jwtService;
     @Autowired
-    AccountService accountService;
+    UserService userService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity userLogin(@RequestBody Account account) {
+    public ResponseEntity userLogin(@RequestBody User user) {
         try {
-            Account a = accountService.getAccountByCredentials(account.getEmail(), account.getPassword());
-            if(a == null) {
+            User u = userService.getUserByCredentials(user.getEmail(), user.getPassword());
+            if(u == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-            return ResponseEntity.ok().body(jwtService.generateToken(a));
+            return ResponseEntity.ok().body(jwtService.generateToken(u));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }

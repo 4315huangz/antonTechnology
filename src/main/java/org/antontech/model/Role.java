@@ -15,6 +15,7 @@ import java.util.List;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="role_id")
     private long id;
     @Column(name = "name")
     private String name;
@@ -30,7 +31,7 @@ public class Role {
     private boolean allowedDelete;
 
     @ManyToMany(mappedBy = "roles")
-    private List<Account> accounts;
+    private List<User> users;
 
     public long getId() {
         return id;
@@ -88,11 +89,11 @@ public class Role {
         this.allowedDelete = allowedDelete;
     }
 
-    public List<Account> getAccounts() {
-        return accounts;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setAccounts(List<Account> accounts) {
-        this.accounts = accounts;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

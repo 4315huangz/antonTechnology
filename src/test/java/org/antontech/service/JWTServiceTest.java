@@ -1,7 +1,7 @@
 package org.antontech.service;
 
 import org.antontech.ApplicationBootstrap;
-import org.antontech.model.Account;
+import org.antontech.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,10 @@ public class JWTServiceTest {
 
     @Test
     public void generateTokenTest() {
-        Account account = new Account();
-        account.setId(1);
-        account.setName("Ziwei");
-        String token = jwtService.generateToken(account);
+        User user = new User();
+        user.setUserId(1);
+        user.setUserName("z4315");
+        String token = jwtService.generateToken(user);
 
         String[] array = token.split("\\.");
         boolean bool = array.length == 3 ? true:false;

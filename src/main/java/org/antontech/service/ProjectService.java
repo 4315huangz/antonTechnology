@@ -15,15 +15,15 @@ public class ProjectService {
     private IProjectDao projectDao;
 
     public List<Project> getProjects(User user) {
-        if("OEM".equals(user.getType())) {
-            return projectDao.getProjectsByOEM(user.getUserId());
-        } else {
-            return projectDao.getProjectsBySupplier(user.getUserId());
-        }
+        return projectDao.getProjects();
     }
 
     public boolean save(Project project) {
         return projectDao.save(project);
+    }
+
+    public Project getById(long id) {
+        return projectDao.getById(id);
     }
 
     public void updateDescription(long id, String description) {

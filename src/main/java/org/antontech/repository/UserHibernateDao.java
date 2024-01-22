@@ -1,7 +1,7 @@
 package org.antontech.repository;
 
-import org.antontech.model.Product;
 import org.antontech.model.User;
+import org.antontech.repository.Exception.UserNotFoundException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import util.HibernateUtil;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -28,44 +27,6 @@ public class UserHibernateDao implements IUserDao {
         try {
             Session session = sessionFactory.openSession();
             Query<User> query = session.createQuery(hql);
-            users = query.list();
-            session.close();
-            return users;
-        } catch (HibernateException e) {
-            logger.error("Open session exception or close session exception", e);
-            throw e;
-        }
-    }
-
-    @Override
-    public List<User> getSuppliers() {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        logger.info("Start to getSuppliers from postgres via HibernateDao");
-        List<User> users;
-        String hql = "From User u WHERE u.type = :userType ";
-        try {
-            Session session = sessionFactory.openSession();
-            Query<User> query = session.createQuery(hql);
-            query.setParameter("userType", "Supplier");
-            users = query.list();
-            session.close();
-            return users;
-        } catch (HibernateException e) {
-            logger.error("Open session exception or close session exception", e);
-            throw e;
-        }
-    }
-
-    @Override
-    public List<User> getOEMs() {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        logger.info("Start to getOEMs from postgres via HibernateDao");
-        List<User> users;
-        String hql = "From User u WHERE u.type = :userType ";
-        try {
-            Session session = sessionFactory.openSession();
-            Query<User> query = session.createQuery(hql);
-            query.setParameter("userType", "OEM");
             users = query.list();
             session.close();
             return users;
@@ -117,7 +78,7 @@ public class UserHibernateDao implements IUserDao {
     }
 
     @Override
-    public List<User> getUsersByIndustry(String industry) {
+    public List<User> getByIndustry(String industry) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to get userByIndustry via HibernateDao");
         List<User> users;
@@ -136,17 +97,17 @@ public class UserHibernateDao implements IUserDao {
     }
 
     @Override
-    public void updateCompanyName(long id, String name) {
+    public void updateEmail(long id, String email) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        logger.info("Start to update user company name via HibernateDao");
+        logger.info("Start to update user email via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE User as u set u.companyName = :name WHERE u.userId = :id";
+        String hql = "UPDATE User as u set u.email = :email WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             Query<User> query = session.createQuery(hql);
             query.setParameter("id", id);
-            query.setParameter("name", name);
+            query.setParameter("email", email);
             query.executeUpdate();
             transaction.commit();
             session.close();
@@ -154,23 +115,23 @@ public class UserHibernateDao implements IUserDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Failed to update user company_name for {}", id, e);
+            logger.error("Failed to update user email for {}", id, e);
             throw e;
         }
     }
 
     @Override
-    public void updateAddress(long id, String address) {
+    public void updatePassword(long id, String password) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update user address via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE User as u set u.address = :address WHERE u.userId = :id";
+        String hql = "UPDATE User as u set u.password = :password WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             Query<User> query = session.createQuery(hql);
             query.setParameter("id", id);
-            query.setParameter("address", address);
+            query.setParameter("password", password);
             query.executeUpdate();
             transaction.commit();
             session.close();
@@ -178,22 +139,25 @@ public class UserHibernateDao implements IUserDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Failed to update user address for {}", id, e);
+            logger.error("Failed to update user password for {}", id, e);
             throw e;
         }
     }
 
     @Override
-    public void updateIndustry(long id, String industry) {
+    public void updateCompany(long id, String companyName, String address, String industry) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        logger.info("Start to update user industry via HibernateDao");
+        logger.info("Start to update user company name via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE User as u set u.industry = :industry WHERE u.userId = :id";
+        String hql = "UPDATE User as u set u.companyName = :companyName, u.address= :address," +
+                "u.industry=:industry WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             Query<User> query = session.createQuery(hql);
             query.setParameter("id", id);
+            query.setParameter("companyName", companyName);
+            query.setParameter("address",address);
             query.setParameter("industry", industry);
             query.executeUpdate();
             transaction.commit();
@@ -202,27 +166,26 @@ public class UserHibernateDao implements IUserDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-            logger.error("Failed to update user industry for {}", id, e);
+            logger.error("Failed to update user company information for {}", id, e);
             throw e;
         }
-
     }
 
     @Override
-    public void updateManager(long id, String manager, String title, String email, String phone) {
+    public void updateManager(long id, String firstName, String lastName, String title, String phone) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update user manager via HibernateDao");
         Transaction transaction = null;
-        String hql = "UPDATE User as u set u.managerName = :manager, u.title= :title," +
-                "u.email=:email, u.phone = :phone WHERE u.userId = :id";
+        String hql = "UPDATE User as u set u.firstName = :firstName, u.lastName = :lastName, u.title= :title," +
+                "u.phone = :phone WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             Query<User> query = session.createQuery(hql);
             query.setParameter("id", id);
-            query.setParameter("manager", manager);
+            query.setParameter("firstName", firstName);
+            query.setParameter("lastName",lastName);
             query.setParameter("title", title);
-            query.setParameter("email", email);
             query.setParameter("phone", phone);
             query.executeUpdate();
             transaction.commit();
@@ -257,6 +220,25 @@ public class UserHibernateDao implements IUserDao {
             }
             logger.error("Unable to delete user id = {}", id, e);
             throw e;
+        }
+    }
+
+    @Override
+    public User getUserByCredentials(String email, String password) throws Exception {
+        String hql = "FROM User as u where lower(u.email) = :email and u.password = :password";
+        logger.info(String.format("User email: %s, password: %s", email, password));
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        logger.info("Start to get user credential via HibernateDao");
+        try {
+            Session session = sessionFactory.openSession();
+            Query<User> query = session.createQuery(hql);
+            query.setParameter("email", email.toLowerCase().trim());
+            query.setParameter("password", password);
+            logger.info("Get user {}", query.uniqueResult());
+            return query.uniqueResult();
+        } catch (Exception e) {
+            logger.error("error: {}", e.getMessage());
+            throw new UserNotFoundException("Can't find user with email = " + email + ", password = " + password);
         }
     }
 }

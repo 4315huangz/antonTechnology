@@ -1,6 +1,4 @@
 package org.antontech.integration;
-
-import org.antontech.model.Product;
 import org.antontech.model.Project;
 import org.antontech.repository.ProjectJDBCDao;
 import org.junit.After;
@@ -20,8 +18,6 @@ public class ProjectJDBCDaoTest {
     public void setup(){
         projectJDBCDao = new ProjectJDBCDao();
         project = new Project();
-        project.setOem(3);
-        project.setSupplier(16);
         project.setStartDate(new Date());
         project.setDescription("Test description");
         project.setManager("Test Manager");
