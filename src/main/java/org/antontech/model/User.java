@@ -61,6 +61,10 @@ public class User {
 
     public User() {
     }
+    public User(long id, String userName, String password,
+                String firstName, String lastName, String email,
+                String companyName, String address, String industry,
+                String title, String phone, String companyType){ }
 
     public long getUserId() {
         return userId;

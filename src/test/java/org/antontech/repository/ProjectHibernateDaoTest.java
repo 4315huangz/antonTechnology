@@ -1,6 +1,7 @@
 package org.antontech.repository;
 
 import org.antontech.model.Product;
+import org.antontech.model.Project;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -13,17 +14,18 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
 import util.HibernateUtil;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProductHibernateDaoTest {
+public class ProjectHibernateDaoTest {
     @Mock
     private SessionFactory mockSessionFactory;
     @Mock
@@ -34,58 +36,40 @@ public class ProductHibernateDaoTest {
     private Transaction mockTransaction;
 
     @Test
-    public void getProductsTest() {
-        IProductDao productDao = new ProductHibernateDao();
-        Product product = new Product(2, "Unit Test Product", "Unit Test Product");
-        List<Product> res = List.of(product);
-
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
+    public void getProjectsTest() {
+        IProjectDao projectDao = new ProjectHibernateDao();
+        Project project = new Project(1, new Date(System.currentTimeMillis()), "Test Description", "TestManager" );
+        List<Project> res = List.of(project);
+        try(MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
             when(mockQuery.list()).thenReturn(res);
             doNothing().when(mockSession).close();
-
-            List<Product> actualRes = productDao.getProducts();
+            List<Project> actualRes = projectDao.getProjects();
             assertEquals(res, actualRes);
         }
     }
 
     @Test
-    public void getProductsTest_getHibernateException_throwHibernateException() {
-        IProductDao productDao = new ProductHibernateDao();
-        Product product = new Product(2, "Unit Test Product", "Unit Test Product");
-        List<Product> res = List.of(product);
+    public void getProjectsTest_getHibernateException_throwHibernateException() {
+        IProjectDao projectDao = new ProjectHibernateDao();
+        Project project = new Project(1, new Date(System.currentTimeMillis()), "Test Description", "TestManager" );
+        List<Project> res = List.of(project);
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
             when(mockQuery.list()).thenReturn(res);
             doThrow(HibernateException.class).when(mockSession).close();
-            assertThrows(HibernateException.class, () -> productDao.getProducts());
-        }
-    }
-
-    @Test
-    public void getByIdTest() {
-        IProductDao productDao = new ProductHibernateDao();
-        Product product = new Product(2, "Unit Test Product", "Unit Test Product");
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(anyString(), any())).thenReturn(mockQuery);
-            when(mockQuery.uniqueResult()).thenReturn(product);
-            doNothing().when(mockSession).close();
-            Product actualRes = productDao.getById(2);
-            assertEquals(product, actualRes);
+            assertThrows(HibernateException.class, () -> projectDao.getProjects());
         }
     }
 
     @Test
     public void save_happyPass() {
-        IProductDao productDao = new ProductHibernateDao();
-        Product product = new Product(2, "Unit Test Product", "Unit Test Product");
+        IProjectDao projectDao = new ProjectHibernateDao();
+        Project project = new Project(1, new Date(System.currentTimeMillis()), "Test Description", "TestManager" );
 
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
@@ -93,42 +77,30 @@ public class ProductHibernateDaoTest {
             when(mockSession.beginTransaction()).thenReturn(mockTransaction);
             doNothing().when(mockTransaction).commit();
             doNothing().when(mockSession).close();
-            boolean res = productDao.save(product);
+            boolean res = projectDao.save(project);
             assertTrue(res);
         }
     }
 
     @Test
-    public void updateNameTest() {
-        IProductDao productDao = new ProductHibernateDao();
-        long id = 2;
-        String newName = "New name";
-
+    public void getByIdTest() {
+        IProjectDao projectDao = new ProjectHibernateDao();
+        Project project = new Project(1, new Date(System.currentTimeMillis()), "Test Description", "TestManager" );
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.beginTransaction()).thenReturn(mockTransaction);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("name"), anyString())).thenReturn(mockQuery);
-            when(mockQuery.executeUpdate()).thenReturn(1);
-            doNothing().when(mockTransaction).commit();
+            when(mockQuery.setParameter(anyString(), any())).thenReturn(mockQuery);
+            when(mockQuery.uniqueResult()).thenReturn(project);
             doNothing().when(mockSession).close();
-
-            productDao.updateName(id, newName);
-            verify(mockSessionFactory, times(1)).openSession();
-            verify(mockSession, times(1)).beginTransaction();
-            verify(mockSession, times(1)).createQuery(anyString());
-            verify(mockQuery, times(2)).setParameter(anyString(), any());
-            verify(mockSession, times(1)).close();
-            verify(mockTransaction, times(1)).commit();
-            verify(mockQuery, times(1)).executeUpdate();
+            Project actualRes = projectDao.getById(1);
+            assertEquals(project, actualRes);
         }
     }
 
     @Test
     public void updateDescriptionTest() {
-        IProductDao productDao = new ProductHibernateDao();
+        IProjectDao projectDao = new ProjectHibernateDao();
         long id = 2;
         String newDescription = "New description";
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
@@ -141,7 +113,33 @@ public class ProductHibernateDaoTest {
             when(mockQuery.executeUpdate()).thenReturn(1);
             doNothing().when(mockTransaction).commit();
             doNothing().when(mockSession).close();
-            productDao.updateDescription(id, newDescription);
+            projectDao.updateDescription(id, newDescription);
+            verify(mockSessionFactory, times(1)).openSession();
+            verify(mockSession, times(1)).beginTransaction();
+            verify(mockSession, times(1)).createQuery(anyString());
+            verify(mockQuery, times(2)).setParameter(anyString(), any());
+            verify(mockSession, times(1)).close();
+            verify(mockTransaction, times(1)).commit();
+            verify(mockQuery, times(1)).executeUpdate();
+        }
+    }
+
+    @Test
+    public void updateManagerTest() {
+        IProjectDao projectDao = new ProjectHibernateDao();
+        long id = 1;
+        String newManager = "New manager";
+        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
+            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
+            when(mockSessionFactory.openSession()).thenReturn(mockSession);
+            when(mockSession.beginTransaction()).thenReturn(mockTransaction);
+            when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(eq("manager"), anyString())).thenReturn(mockQuery);
+            when(mockQuery.executeUpdate()).thenReturn(1);
+            doNothing().when(mockTransaction).commit();
+            doNothing().when(mockSession).close();
+            projectDao.updateManager(id, newManager);
             verify(mockSessionFactory, times(1)).openSession();
             verify(mockSession, times(1)).beginTransaction();
             verify(mockSession, times(1)).createQuery(anyString());
@@ -154,8 +152,8 @@ public class ProductHibernateDaoTest {
 
     @Test
     public void deleteTest() {
-        IProductDao productDao = new ProductHibernateDao();
-        long id = 2;
+        IProjectDao projectDao = new ProjectHibernateDao();
+        long id = 1;
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
@@ -165,7 +163,7 @@ public class ProductHibernateDaoTest {
             when(mockQuery.executeUpdate()).thenReturn(1);
             doNothing().when(mockTransaction).commit();
             doNothing().when(mockSession).close();
-            productDao.delete(id);
+            projectDao.delete(id);
             verify(mockSessionFactory, times(1)).openSession();
             verify(mockSession, times(1)).beginTransaction();
             verify(mockSession, times(1)).createQuery(anyString());
@@ -173,24 +171,6 @@ public class ProductHibernateDaoTest {
             verify(mockQuery, times(1)).executeUpdate();
             verify(mockSession, times(1)).close();
             verify(mockTransaction, times(1)).commit();
-        }
-    }
-
-    @Test
-    public void searchByDescription() {
-        IProductDao productDao = new ProductHibernateDao();
-        Product product = new Product(2, "Unit Test Product", "Unit Test Product");
-        List<Product> res = List.of(product);
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("keyword"), anyString())).thenReturn(mockQuery);
-            when(mockQuery.getResultList()).thenReturn(res);
-            doNothing().when(mockSession).close();
-
-            List<Product> actualRes = productDao.searchByDescription("Test");
-            assertEquals(res, actualRes);
         }
     }
 }

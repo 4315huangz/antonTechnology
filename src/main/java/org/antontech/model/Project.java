@@ -21,8 +21,9 @@ public class Project {
     @ManyToMany(mappedBy = "projects")
     private List<User> users;
 
-    public Project() {
-    }
+    public Project() { }
+
+    public Project(long id, Date startDate, String description, String manager) { }
 
     public long getProjectId() {return projectId;}
 
