@@ -14,9 +14,7 @@ public class ProjectService {
     @Autowired
     private IProjectDao projectDao;
 
-    public List<Project> getProjects(User user) {
-        return projectDao.getProjects();
-    }
+    public List<Project> getProjects() {return projectDao.getProjects();}
 
     public boolean save(Project project) {
         return projectDao.save(project);

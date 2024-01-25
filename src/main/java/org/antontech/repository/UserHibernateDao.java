@@ -82,11 +82,11 @@ public class UserHibernateDao implements IUserDao {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to get userByIndustry via HibernateDao");
         List<User> users;
-        String hql = "From User as u WHERE u.industry = :industry";
+        String hql = "From User as u WHERE lower(u.industry) = :industry";
         try {
             Session session = sessionFactory.openSession();
             Query<User> query = session.createQuery(hql);
-            query.setParameter("industry", industry);
+            query.setParameter("industry", industry.toLowerCase().trim());
             users = query.list();
             session.close();
             return  users;

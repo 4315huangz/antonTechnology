@@ -2,6 +2,7 @@ package org.antontech.service;
 
 import org.antontech.model.User;
 import org.antontech.repository.IUserDao;
+import org.antontech.repository.UserHibernateDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +14,11 @@ import java.util.List;
 @Service
 public class UserService {
     @Autowired
-    private IUserDao userDao;
+    private UserHibernateDao userDao;
     private Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public List<User> getUsers(User user) {
+    public List<User> getUsers() {
         return userDao.getUsers();
-    }
-
-    public User getUserByCredentials(String email, String password) throws Exception {
-        return  userDao.getUserByCredentials(email, password);
     }
 
     public boolean save(User user) {
@@ -30,8 +27,8 @@ public class UserService {
 
     public User getById(long id) { return userDao.getById(id); }
 
-    public void getByIndustry(String industry) {
-        userDao.getByIndustry(industry);
+    public List<User> getByIndustry(String industry) {
+        return userDao.getByIndustry(industry);
     }
 
     public void updateEmail(long id, String email) {
@@ -50,6 +47,10 @@ public class UserService {
 
     public void delete(long id) {
         userDao.delete(id);
+    }
+
+    public User getUserByCredentials(String email, String password) throws Exception {
+        return  userDao.getUserByCredentials(email, password);
     }
 
 }

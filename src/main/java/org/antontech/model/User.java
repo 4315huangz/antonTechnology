@@ -51,7 +51,7 @@ public class User {
     @JsonIgnore
     private List<Project> projects;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = { @JoinColumn(name = "user_id")},
             inverseJoinColumns = { @JoinColumn(name = "role_id")}
@@ -185,5 +185,9 @@ public class User {
     public void setProjects(List<Project> projects) {
         this.projects = projects;
     }
+
+    public List<Role> getRoles() { return roles; }
+
+    public void setRoles(List<Role> roles) { this.roles = roles; }
 }
 
