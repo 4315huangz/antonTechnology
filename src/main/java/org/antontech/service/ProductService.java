@@ -11,8 +11,6 @@ import java.util.List;
 
 @Service
 public class ProductService {
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
-
     @Autowired
     private IProductDao productDao;
 

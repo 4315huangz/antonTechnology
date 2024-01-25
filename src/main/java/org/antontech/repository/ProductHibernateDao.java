@@ -1,7 +1,6 @@
 package org.antontech.repository;
 
 import org.antontech.model.Product;
-
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;

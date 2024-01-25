@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = {"/product","/products"})
@@ -28,7 +29,7 @@ public class ProductController {
     public ResponseEntity<List<Product>> getProducts() {
         logger.info("I am in getProducts controller");
         List<Product> products = productService.getProducts();
-        if(products == null) {
+        if(products.size() == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
         return ResponseEntity.ok(products);
@@ -42,41 +43,49 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Product with ID " + id + " not found");
         }
-        return ResponseEntity.ok(p);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(p);
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<String> create(@RequestBody Product product){
+    public String create(@RequestBody Product product){
         logger.info("Post a new product object {}", product.getName());
-        boolean isSaved = productService.save(product);
-        if (isSaved) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Product created successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to create product");
-        }
+        if (productService.save(product))
+            return "Product created successfully";
+        return null;
     }
 
     @RequestMapping(value = "/{id}", params = {"name"}, method = RequestMethod.PATCH)
     public ResponseEntity<String> updateProductName(@PathVariable(name = "id") long id, @RequestParam(name = "name") String name){
         logger.info("Pass in variable id: {} and name {}.", id, name);
-        productService.updateName(id,name);
-        return ResponseEntity.ok().body("Product name is updated successfully");
+        if(getById(id).getStatusCode() == HttpStatus.ACCEPTED) {
+            productService.updateName(id, name);
+            return ResponseEntity.ok().body("Product name is updated successfully");
+        } else
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Product with ID " + id + " is not found, fail to update the name");
     }
 
     @RequestMapping(value = "/{id}", params = {"description"}, method = RequestMethod.PATCH)
     public ResponseEntity<String> updateProductDescription(@PathVariable(name = "id") long id, @RequestParam(name = "description") String description){
         logger.info("Pass in variable id: {} and description {}.", id, description);
-        productService.updateDescription(id,description);
-        return ResponseEntity.ok().body("Product description is updated successfully");
+        if(getById(id).getStatusCode() == HttpStatus.ACCEPTED) {
+            productService.updateDescription(id, description);
+            return ResponseEntity.ok().body("Product description is updated successfully");
+        } else
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Product with ID " + id + " is not found, fail to update the description");
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteProduct(@PathVariable long id) {
         logger.info("I am in deleteProduct controller");
-        productService.delete(id);
-        return ResponseEntity.ok().body("Product is deleted successfully");
+        if(getById(id).getStatusCode() == HttpStatus.ACCEPTED) {
+            productService.delete(id);
+            return ResponseEntity.ok().body("Product is deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Product with ID" + id + "is not found, fail to delete product.");
+        }
     }
 
     @RequestMapping(value = "/search/{keyword}", method = RequestMethod.GET)

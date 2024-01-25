@@ -34,43 +34,52 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<String> create(@RequestBody Project project) {
+    public String create(@RequestBody Project project) {
         logger.info("Post a new project object {}", project.getProjectId());
-        boolean isSaved = projectService.save(project);
-        if(isSaved)
-            return ResponseEntity.status(HttpStatus.CREATED).body("Project created successfully");
-        else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create project");
+        if(projectService.save(project)) {
+            return "Project created successfully";
+        }
+        return null;
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public ResponseEntity getProjectById(@PathVariable(name = "id")long id){
         Project p = projectService.getById(id);
         if(p == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project with ID " + id + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project with ID " + id + " is not found");
         }
-        return ResponseEntity.ok(p);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(p);
     }
 
     @RequestMapping(value = "/changeDescription/{id}", params = {"description"}, method = RequestMethod.PATCH)
     public ResponseEntity<String> updateProjectDescription(@PathVariable(name = "id") long id, @RequestParam(name = "description") String description){
         logger.info("Pass in variable id: {} and description {}.", id, description);
-        projectService.updateDescription(id,description);
-        return ResponseEntity.ok().body("Description for project "+id+" is updated successfully");
+        if(getProjectById(id).getStatusCode() == HttpStatus.ACCEPTED) {
+            projectService.updateDescription(id,description);
+            return ResponseEntity.ok().body("Description for project "+id+" is updated successfully");
+        } else
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Project with ID " + id + " is not found, fail to update the description");
     }
 
     @RequestMapping(value = "/changeManager/{id}", params = {"manager"}, method = RequestMethod.PATCH)
     public ResponseEntity<String> updateProjectManager(@PathVariable(name = "id") long id, @RequestParam(name = "manager") String manager){
         logger.info("Pass in variable id: {} and manager {}.", id, manager);
-        projectService.updateManager(id,manager);
-        return ResponseEntity.ok().body("Manager for project "+id+" is updated successfully");
+        if(getProjectById(id).getStatusCode() == HttpStatus.ACCEPTED) {
+            projectService.updateManager(id, manager);
+            return ResponseEntity.ok().body("Manager for project " + id + " is updated successfully");
+        } else return  ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Project with ID " + id + " is not found, fail to update the manager");
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteProject(@PathVariable long id) {
         logger.info("I am in delete Project controller");
-        projectService.delete(id);
-        return ResponseEntity.ok().body("Project " + id + " is deleted successfully");
+        if(getProjectById(id).getStatusCode() == HttpStatus.ACCEPTED) {
+            projectService.delete(id);
+            return ResponseEntity.ok().body("Project " + id + " is deleted successfully");
+        } else return  ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Project with ID " + id + " is not found, fail to delete");
     }
 
 }
