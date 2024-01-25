@@ -10,7 +10,7 @@ import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import util.HibernateUtil;
+import org.antontech.util.HibernateUtil;
 
 import java.util.List;
 

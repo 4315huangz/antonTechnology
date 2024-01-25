@@ -1,6 +1,5 @@
 package org.antontech.repository;
 
-import org.antontech.model.Product;
 import org.antontech.model.Project;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -12,9 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
-import util.HibernateUtil;
+import org.antontech.util.HibernateUtil;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 

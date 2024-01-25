@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
-import util.HibernateUtil;
+import org.antontech.util.HibernateUtil;
 
 import java.util.List;
 
