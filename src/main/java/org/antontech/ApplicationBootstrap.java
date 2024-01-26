@@ -10,14 +10,8 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication(scanBasePackages = {"org.antontech"})
 @ServletComponentScan(basePackages = {"org.antontech.filter"})
-@EnableCaching
 public class ApplicationBootstrap {
     public static void main(String[] args) {
         SpringApplication.run(ApplicationBootstrap.class, args);
-    }
-
-    @Bean
-    public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("identityCache");
     }
 }

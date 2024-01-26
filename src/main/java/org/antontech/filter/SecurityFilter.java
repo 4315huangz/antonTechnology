@@ -1,16 +1,23 @@
 package org.antontech.filter;
 
+import com.google.common.cache.LoadingCache;
 import io.jsonwebtoken.Claims;
 import org.antontech.model.Role;
 import org.antontech.model.User;
+import org.antontech.service.RoleCacheService;
 import org.antontech.service.JWTService;
 import org.antontech.service.RoleService;
 import org.antontech.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.servlet.*;
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterConfig;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +26,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @WebFilter(filterName = "SecurityFilter", urlPatterns = "/*", dispatcherTypes = {DispatcherType.REQUEST})
 public class SecurityFilter implements Filter {
@@ -29,6 +35,8 @@ public class SecurityFilter implements Filter {
     private UserService userService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    RoleCacheService roleCacheService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     private static final Set<String> IGNORED_PATHS = new HashSet<>((Arrays.asList("/auth")));
@@ -71,11 +79,18 @@ public class SecurityFilter implements Filter {
             if(claims.getId() != null) {
                 User u = userService.getById(Long.valueOf(claims.getId()));
                 if(u != null) {
+                    List<Role> roles = roleCacheService.getRoles(Long.valueOf(claims.getId()));
+                    if (roles == null || roles.isEmpty()) {
+                        logger.info("Roles not found in cache. Fetching from the database.");
+                        roles = u.getRoles();
+                        roleCacheService.putRoles(Long.valueOf(claims.getId()), roles);
+                    } else {
+                        logger.info("Roles found in cache.");
+                    }
                     String allowedReadResources = "";
                     String allowedCreateResources = "";
                     String allowedUpdateResources = "";
                     String allowedDeleteResources = "";
-                    List<Role> roles = u.getRoles();
                     for (Role role : roles) {
                         if(roleService.getAllowedReadResources(role) != null)
                             allowedReadResources = String.join(roleService.getAllowedReadResources(role), allowedReadResources, ",");
@@ -105,6 +120,8 @@ public class SecurityFilter implements Filter {
                         case "DELETE":
                             allowedResources = allowedDeleteResources;
                     }
+                    logger.info("======, allowedResources = {}", allowedResources);
+                    if(allowedResources.trim().isEmpty()) return statusCode;
                     for (String s : allowedResources.split(",")) {
                         if (uri.trim().toLowerCase().startsWith(s.trim().toLowerCase())) {
                             statusCode = HttpServletResponse.SC_ACCEPTED;
