@@ -1,6 +1,7 @@
 package org.antontech.repository;
 
-import org.antontech.model.Product;
+import org.antontech.dto.ProjectDTO;
+import org.antontech.model.User;
 import org.antontech.model.Project;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.antontech.util.HibernateUtil;
 
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class ProjectHibernateDao implements IProjectDao{
@@ -45,7 +47,6 @@ public class ProjectHibernateDao implements IProjectDao{
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             session.save(project);
-            transaction.commit();
             session.close();
             return true;
         } catch (HibernateException e) {
@@ -86,7 +87,7 @@ public class ProjectHibernateDao implements IProjectDao{
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
-            Query<Product> query = session.createQuery(hql);
+            Query<Project> query = session.createQuery(hql);
             query.setParameter("id", id);
             query.setParameter("description", description);
             query.executeUpdate();
@@ -111,7 +112,7 @@ public class ProjectHibernateDao implements IProjectDao{
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
-            Query<Product> query = session.createQuery(hql);
+            Query<Project> query = session.createQuery(hql);
             query.setParameter("id", id);
             query.setParameter("manager", manager);
             query.executeUpdate();
@@ -137,7 +138,7 @@ public class ProjectHibernateDao implements IProjectDao{
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
-            Query<Product> query = session.createQuery(hql);
+            Query<Project> query = session.createQuery(hql);
             query.setParameter("Id", id);
             query.executeUpdate();
             transaction.commit();

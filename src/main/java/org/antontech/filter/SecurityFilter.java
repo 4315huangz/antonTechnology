@@ -116,6 +116,9 @@ public class SecurityFilter implements Filter {
                         case "PUT":
                             allowedResources = allowedUpdateResources;
                             break;
+                        case "PATCH":
+                            allowedResources = allowedUpdateResources;
+                            break;
                         case "DELETE":
                             allowedResources = allowedDeleteResources;
                     }

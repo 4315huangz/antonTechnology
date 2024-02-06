@@ -1,5 +1,6 @@
 package org.antontech.controller;
 
+import org.antontech.dto.ProjectDTO;
 import org.antontech.model.Project;
 import org.antontech.service.ProjectService;
 import org.slf4j.Logger;
@@ -24,9 +25,9 @@ public class ProjectController {
     private ProjectService projectService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<List<Project>> getProjects(){
+    public ResponseEntity<List<ProjectDTO>> getProjects(){
         logger.info("I am in getProejcts controller");
-        List<Project> projects = projectService.getProjects();
+        List<ProjectDTO> projects = projectService.getProjects();
         if(projects == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
@@ -34,9 +35,9 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String create(@RequestBody Project project) {
-        logger.info("Post a new project object {}", project.getProjectId());
-        if(projectService.save(project)) {
+    public String create(@RequestBody ProjectDTO projectDTO) {
+        logger.info("Post a new project object {}", projectDTO.getProjectId());
+        if(projectService.save(projectDTO)) {
             return "Project created successfully";
         }
         return null;
@@ -44,7 +45,7 @@ public class ProjectController {
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public ResponseEntity getProjectById(@PathVariable(name = "id")long id){
-        Project p = projectService.getById(id);
+        ProjectDTO p = projectService.getById(id);
         if(p == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project with ID " + id + " is not found");
         }
