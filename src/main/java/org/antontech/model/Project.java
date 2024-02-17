@@ -1,6 +1,7 @@
 package org.antontech.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class Project {
     @Column(name = "manager")
     private String manager;
 
-    @ManyToMany(mappedBy = "projects", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "projects", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<User> users;
 
     public Project() { }
@@ -61,5 +62,11 @@ public class Project {
 
     public void setUsers(List<User> users) {
         this.users = users;
+    }
+
+    public void addUser(User user) {
+        if(users == null) users = new ArrayList<>();
+        users.add(user);
+        user.getProjects().add(this);
     }
 }

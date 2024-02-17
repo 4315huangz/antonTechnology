@@ -2,10 +2,7 @@ package org.antontech.repository;
 
 import org.antontech.model.User;
 import org.antontech.repository.Exception.UserNotFoundException;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +41,7 @@ public class UserHibernateDao implements IUserDao {
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
-            session.save(user);
+            session.saveOrUpdate(user);
             transaction.commit();
             session.close();
             return true;

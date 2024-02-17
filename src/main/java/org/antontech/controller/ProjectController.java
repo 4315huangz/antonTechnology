@@ -2,7 +2,9 @@ package org.antontech.controller;
 
 import org.antontech.dto.ProjectDTO;
 import org.antontech.model.Project;
+import org.antontech.model.User;
 import org.antontech.service.ProjectService;
+import org.antontech.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ public class ProjectController {
     private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
     @Autowired
     private ProjectService projectService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<List<ProjectDTO>> getProjects(){
@@ -35,12 +39,12 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String create(@RequestBody ProjectDTO projectDTO) {
+    public ResponseEntity<String> create(@RequestBody ProjectDTO projectDTO) {
         logger.info("Post a new project object {}", projectDTO.getProjectId());
         if(projectService.save(projectDTO)) {
-            return "Project created successfully";
+            return ResponseEntity.ok("Project created successfully");
         }
-        return null;
+        return ResponseEntity.badRequest().body("Failed to create project");
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)

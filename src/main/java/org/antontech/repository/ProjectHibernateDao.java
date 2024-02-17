@@ -46,7 +46,8 @@ public class ProjectHibernateDao implements IProjectDao{
         try {
             Session session = sessionFactory.openSession();
             transaction = session.beginTransaction();
-            session.save(project);
+            session.saveOrUpdate(project);
+            transaction.commit();
             session.close();
             return true;
         } catch (HibernateException e) {
