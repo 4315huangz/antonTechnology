@@ -1,0 +1,298 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Cloudformation template to create all SG and roles
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: Select a VPC with Subnets covering 2 Availability zone at least.
+    MinLength: 1
+Resources:
+  CodeBuildRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "codebuild.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "cloudformation.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: "CodeBuildRolePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: 
+                  - "ec2:*"
+                  - "cloudwatch:*"
+                  - "s3:*"
+                  - "logs:*"
+                  - "ecr:*"
+                  - "cloudfront:*"
+                  - "cloudformation:*"
+                  - "iam:*"
+                  - "lambda:*"
+                  - "events:*"
+                  - "ecs:*"
+                  - "sqs:*"
+                  - "dynamodb:*"
+                  - "sns:*"
+                  - "ssm:*"
+                  - "rds:*"
+                Resource: "*"
+  CodePipelineRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "codepipeline.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: "CodePipelineRolePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: 
+                  - "s3:*"
+                  - "cloudformation:*"
+                  - "codebuild:*"
+                  - "codestar-connections:*"
+                Resource: "*"
+  ECSTaskRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ecs-tasks.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: "ECSTaskPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: 
+                  - "sqs:*"
+                  - "logs:*"
+                  - "s3:*"
+                  - "quicksight:GetDashboardEmbedUrl"
+                  - "quicksight:GetAuthCode"
+                Resource: "*"
+  ECSServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ecs.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: "ECSServicePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: 
+                  - "elasticloadbalancing:*"
+                  - "ec2:*"
+                  - "sqs:*"
+                  - "s3:*"
+                Resource: "*"
+  AutoscalingRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "application-autoscaling.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: "AutoscalingPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: 
+                  - "application-autoscaling:*"
+                  - "cloudwatch:*"
+                  - "ecs:*"
+                  - "ec2:*"
+                Resource: "*"
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: ecs-service
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - ecs:*
+            - sqs:*
+            - ecr:*
+            - logs:*
+            - elasticloadbalancing:*
+            - s3:*
+            - cloudwatch:*
+            - dynamodb:*
+            - ec2:*
+            - iam:*
+            - kinesis:*
+            Resource: "*"
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles: [!Ref 'EC2Role']
+  ALBSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ALB security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        -
+          Key: Name
+          Value: ALBSG
+      VpcId: !Ref VpcId
+  ECSSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ECS Security Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 31000
+          ToPort: 61000
+          SourceSecurityGroupId: !GetAtt ALBSG.GroupId
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 172.31.0.0/16
+      Tags:
+        -
+          Key: Name
+          Value: ECSSG
+      VpcId: !Ref VpcId
+  DemoDBSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: DemoDBSG Security Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !GetAtt ECSSG.GroupId
+      Tags:
+        -
+          Key: Name
+          Value: DemoDBSG
+      VpcId: !Ref VpcId
+
+Outputs:
+  CodeBuildRole:
+    Value: !GetAtt 'CodeBuildRole.Arn'
+    Description: CodeBuildRole arn
+    Export: 
+      Name: !Sub "${AWS::StackName}-CodeBuildRole"
+  CodePipelineRole:
+    Value: !GetAtt 'CodePipelineRole.Arn'
+    Description: CodePipelineRole arn
+    Export: 
+      Name: !Sub "${AWS::StackName}-CodePipelineRole"
+  ECSTaskRole:
+    Value: !GetAtt 'ECSTaskRole.Arn'
+    Description: ECSTaskRole arn
+    Export: 
+      Name: !Sub "${AWS::StackName}-ECSTaskRole"
+  ECSServiceRole:
+    Value: !GetAtt 'ECSServiceRole.Arn'
+    Description: ECSServiceRole arn
+    Export: 
+      Name: !Sub "${AWS::StackName}-ECSServiceRole"
+  AutoscalingRole:
+    Value: !GetAtt 'AutoscalingRole.Arn'
+    Description: AutoscalingRole arn
+    Export: 
+      Name: !Sub "${AWS::StackName}-AutoscalingRole"
+  EC2InstanceProfile:
+    Value: !GetAtt 'EC2InstanceProfile.Arn'
+    Description: EC2InstanceProfile arn
+    Export: 
+      Name: !Sub "${AWS::StackName}-EC2InstanceProfile" 
+  StackName:
+    Value: !Ref AWS::StackName
+  ALBSG:
+    Value: !Ref ALBSG
+    Description: ALB security group
+    Export: 
+      Name: !Sub ${AWS::StackName}-ALBSG
+  ECSSG:
+    Value: !Ref ECSSG
+    Description: ECS security group
+    Export: 
+      Name: !Sub ${AWS::StackName}-ECSSG
+  DemoDBSG:
+    Value: !Ref DemoDBSG
+    Description: DemoDBSG security group
+    Export: 
+      Name: !Sub ${AWS::StackName}-DemoDBSG

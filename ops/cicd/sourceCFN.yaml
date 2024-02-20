@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  VPCName:
+    Description: 'Name of the VPC'
+    Type: String
+  
+  S3BucketName:
+    Description: 'Name of the S3 bucket containing the related files'
+    Type: String
+  
+  DBName:
+    Description: The database name
+    Type: String
+
+  DBUser:
+    Description: The database admin user name
+    Type: String
+
+  DBPassword:
+    Description: The database admin password
+    Type: String
+    NoEcho: true
+  
+  ECRRepo:
+    Description: The ECR Repo Name
+    Type: String
+  
+  ImageTag:
+    Type: String
+    Description: The 8 digits git commit hash code
+  
+  OAuthToken:
+    Type: String
+    NoEcho: true
+
+Resources:
+  VPCStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub 'https://asc-sde-training-templates.s3.amazonaws.com/templates/vpc.yml'
+      Parameters:
+        VPCName: !Ref VPCName
+
+  SecurityStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub 'https://asc-sde-training-templates.s3.amazonaws.com/templates/security.yaml'
+      Parameters:
+        VpcId: !GetAtt [VPCStack, Outputs.VPCId]
+
+  RDSStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub 'https://asc-sde-training-templates.s3.amazonaws.com/templates/rds.yaml'
+      Parameters:
+        VPCId: !GetAtt [VPCStack, Outputs.VPCId]
+        SubnetIds: !Join [",", [!GetAtt [VPCStack, Outputs.PrivateSubnet0],!GetAtt [VPCStack, Outputs.PrivateSubnet1]]]
+        SecurityStack: !GetAtt [SecurityStack, Outputs.StackName]
+        DBName: !Ref DBName
+        DBUser: !Ref DBUser
+        DBPassword: !Ref DBPassword
+
+  ELBStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub 'https://asc-sde-training-templates.s3.amazonaws.com/templates/elb.yaml'
+      Parameters:
+        VpcId: !GetAtt [VPCStack, Outputs.VPCId]
+        PublicSubnets: !Join [",", [!GetAtt [VPCStack, Outputs.PublicSubnet0],!GetAtt [VPCStack, Outputs.PublicSubnet1]]]
+        SecurityStack: !GetAtt [SecurityStack, Outputs.StackName]
+
+  ECSStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub 'https://asc-sde-training-templates.s3.amazonaws.com/templates/ecs.yaml'
+      Parameters:
+        ELBStack: !GetAtt [ELBStack, Outputs.StackName]
+        SecurityStack: !GetAtt [SecurityStack, Outputs.StackName]
+        Subnets: !Join [",", [!GetAtt [VPCStack, Outputs.PrivateSubnet0],!GetAtt [VPCStack, Outputs.PrivateSubnet1]]]
+        JavaImageTag: !Ref ImageTag
+        DBName: !Ref DBName
+        DBUser: !Ref DBUser
+        DBPassword: !Ref DBPassword
+        DBEndpoint: !GetAtt [RDSStack, Outputs.RDSEndpoint]
+        ECRRepo: !Ref ECRRepo
+
+  CodePipelineStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub 'https://asc-sde-training-templates.s3.amazonaws.com/templates/codepipeline.yaml'
+      Parameters:
+        SecurityStack: !GetAtt [SecurityStack, Outputs.StackName]
+        VpcStack: !GetAtt [VPCStack, Outputs.StackName]
+        DBName: !Ref DBName
+        DBUser: !Ref DBUser
+        DBPassword: !Ref DBPassword
+        DBEndpoint: !GetAtt [RDSStack, Outputs.RDSEndpoint]
+        ECRRepo: !Ref ECRRepo
+        ECSStack: !GetAtt [ECSStack, Outputs.StackName]
+        S3BucketName: !Ref S3BucketName
+        OAuthToken: !Ref OAuthToken

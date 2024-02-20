@@ -1,0 +1,292 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cloudformation template for backend pipeline
+Parameters:
+  SecurityStack:
+    Description: Name of an active CloudFormation stack that contains all roles and SGs resources
+    Type: String
+    Default: Ascending-Security
+  VpcStack:
+    Type: String
+    Description: Name of VPC Stack
+  DBName:
+    Description: The database name
+    Type: String
+
+  DBUser:
+    Description: The database admin user name
+    Type: String
+
+  DBPassword:
+    Description: The database admin password
+    Type: String
+    NoEcho: true
+  
+  DBEndpoint:
+    Description: The database endpoint
+    Type: String
+
+  OAuthToken:
+    Type: String
+    NoEcho: true
+  ECSStack:
+    Description: Name of an active CloudFormation stack that contains load balancers and all target groups
+    Type: String
+  ECRRepo:
+    Description: The ECR Repo Name
+    Type: String
+  S3BucketName:
+    Description: 'Name of the S3 bucket containing the related files'
+    Type: String
+
+Resources:
+  UnitTest:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: no_artifacts
+      Description: Unit Test before Build and Deployment
+      VpcConfig:
+        SecurityGroupIds: 
+          - Fn::ImportValue: !Sub "${SecurityStack}-ECSSG"
+        Subnets: 
+          - Fn::ImportValue: !Sub "${AWS::Region}-${VpcStack}-PrivateSubnet1"
+        VpcId: 
+          Fn::ImportValue: !Sub "${AWS::Region}-${VpcStack}-VPC"
+      Environment: 
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
+        Type: LINUX_CONTAINER
+        PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: DB_USERNAME
+            Value: !Ref DBUser
+          - Name: DB_URL
+            Value: !Ref DBEndpoint
+          - Name: DB_PASSWORD
+            Value: !Ref DBPassword
+          - Name: DB_NAME
+            Value: !Ref DBName
+      ServiceRole: 
+        Fn::ImportValue: !Sub "${SecurityStack}-CodeBuildRole"
+      Name:
+        Fn::Join:
+          - ''
+          - - !Ref AWS::StackName
+            - '-UnitTest'
+      Source:
+        BuildSpec: |
+          version: 0.2
+          phases:
+            install:
+              runtime-versions:
+                java: corretto17
+            pre_build:
+              commands:
+                - cd mvc
+                - ls
+                - mvn clean compile flyway:migrate -P unit -Ddb_url=${DB_URL}:5432/${DB_NAME} -Ddb_username=${DB_USERNAME} -Ddb_password=${DB_PASSWORD} -q
+            build:
+              commands:
+                - mvn test -Dspring.profiles.active=unit -Ddatabase.serverName=jdbc:postgresql://${DB_URL}:5432/${DB_NAME} -Ddatabase.username=${DB_USERNAME} -Ddatabase.password=${DB_PASSWORD} -Djwt.expiration=86400 -Djwt.secret=123456789 -q
+        GitCloneDepth: 1
+        Location: https://github.com/ryohang/car-dealer-spring-mvc.git
+        Type: GITHUB
+  BuildWarFile:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: no_artifacts
+      Description: Build war file
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: S3
+            Value: !Ref S3BucketName
+      Name:
+        Fn::Join:
+          - ''
+          - - !Ref AWS::StackName
+            - '-BuildWarFile'
+      ServiceRole: 
+        Fn::ImportValue: !Sub "${SecurityStack}-CodeBuildRole"
+      Source:
+        BuildSpec: |
+          version: 0.2
+          phases:
+            install:
+              runtime-versions:
+                java: corretto17
+            pre_build:
+              commands:
+                - if [ -z "$CODEBUILD_RESOLVED_SOURCE_VERSION" ]; then SRC_HASH=${CODEBUILD_SOURCE_VERSION}; else SRC_HASH=${CODEBUILD_RESOLVED_SOURCE_VERSION}; fi
+                - HASH=$(echo ${SRC_HASH} | cut -b 1-8)
+            build:
+              commands:
+                - cd mvc
+                - mvn compile package -DskipTests=true -q
+                - aws s3 cp target/*.war s3://${S3}/projects/${HASH}.war
+        GitCloneDepth: 1
+        Location: https://github.com/ryohang/car-dealer-spring-mvc.git
+        Type: GITHUB
+  BuildImage:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: no_artifacts
+      Description: Build Image and push it to ECR
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
+        Type: LINUX_CONTAINER
+        PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: ECR
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.us-east-1.amazonaws.com/${ECRRepo}
+          - Name: S3
+            Value: !Ref S3BucketName
+      Name:
+        Fn::Join:
+          - ''
+          - - !Ref AWS::StackName
+            - '-BuildImage'
+      ServiceRole: 
+        Fn::ImportValue: !Sub "${SecurityStack}-CodeBuildRole"
+      Source:
+        BuildSpec: |
+          version: 0.2
+          phases:
+            pre_build:
+              commands:
+                - $(aws ecr get-login --no-include-email --region us-east-1)
+                - if [ -z "$CODEBUILD_RESOLVED_SOURCE_VERSION" ]; then SRC_HASH=${CODEBUILD_SOURCE_VERSION}; else SRC_HASH=${CODEBUILD_RESOLVED_SOURCE_VERSION}; fi
+                - IMAGE_TAG=$(echo ${SRC_HASH} | cut -b 1-8)
+            build:
+              commands:
+                - cd ./ops/container/
+                - aws s3 cp s3://${S3}/projects/${IMAGE_TAG}.war .
+                - docker build -t "${ECR}:${IMAGE_TAG}" .
+            post_build:
+              commands:
+                - docker push ${ECR}:${IMAGE_TAG}
+                - echo "export TAG=${IMAGE_TAG}" > tag.sh
+                - aws s3 cp tag.sh s3://${S3}/projects/ --quiet
+        GitCloneDepth: 1
+        Location: https://github.com/ryohang/car-dealer-spring-mvc.git
+        Type: GITHUB
+  UpdateCloudFormation:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: no_artifacts
+      Description: Update Cloudformation template
+      Name:
+        Fn::Join:
+          - ''
+          - - !Ref AWS::StackName
+            - 'UpdateCloudFormation'
+      Environment: 
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: STACK_NAME
+            Value: !Ref ECSStack
+          - Name: S3
+            Value: !Ref S3BucketName
+      ServiceRole: 
+        Fn::ImportValue: !Sub "${SecurityStack}-CodeBuildRole"
+      TimeoutInMinutes: 60
+      Source: 
+        BuildSpec: |
+          version: 0.2
+          phases:
+            pre_build:
+              commands:
+                - aws s3 cp s3://${S3}/projects/tag.sh . --quiet
+                - . ./tag.sh
+            build:
+              commands:
+                - aws cloudformation update-stack --stack-name ${STACK_NAME} --use-previous-template --parameters ParameterKey=ELBStack,UsePreviousValue=true ParameterKey=SecurityStack,UsePreviousValue=true ParameterKey=Subnets,UsePreviousValue=true ParameterKey=JavaImageTag,ParameterValue=${TAG} ParameterKey=DBName,UsePreviousValue=true ParameterKey=DBUser,UsePreviousValue=true ParameterKey=DBPassword,UsePreviousValue=true ParameterKey=DBEndpoint,UsePreviousValue=true ParameterKey=ECRRepo,UsePreviousValue=true
+        GitCloneDepth: 1
+        Location: https://github.com/ryohang/car-dealer-spring-mvc.git
+        Type: GITHUB
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn: 
+        Fn::ImportValue: !Sub "${SecurityStack}-CodePipelineRole"
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3BucketName
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version: 1
+              Configuration:
+                Owner: ryohang
+                Repo: car-dealer-spring-mvc
+                Branch: master
+                OAuthToken: !Ref OAuthToken
+              OutputArtifacts:
+                - Name: Source
+              RunOrder: 1
+        - Name: UnitTest
+          Actions:
+            - Name: UnitTest
+              ActionTypeId: 
+                Category: Test
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref UnitTest
+              InputArtifacts:
+                - Name: Source
+              RunOrder: 1
+        - Name: BuildWarFile
+          Actions:
+            - Name: BuildWarFile
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref BuildWarFile
+              InputArtifacts:
+                - Name: Source
+              RunOrder: 1
+        - Name: BuildImage
+          Actions:
+            - Name: BuildImage
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref BuildImage
+              InputArtifacts:
+                - Name: Source
+              RunOrder: 1
+        - Name: Deploy
+          Actions:
+            - Name: UpdateCloudFormation
+              ActionTypeId: 
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref UpdateCloudFormation
+              InputArtifacts:
+                - Name: Source
+              RunOrder: 1

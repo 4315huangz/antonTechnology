@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: RDS PostgreSQL CloudFormation Template
+Parameters:
+  DBName:
+    Description: The database name
+    Type: String
+
+  DBUser:
+    Description: The database admin user name
+    Type: String
+
+  DBPassword:
+    Description: The database admin password
+    Type: String
+    NoEcho: true
+
+  VPCId:
+    Description: VPC id where the RDS instance will be hosted
+    Type: AWS::EC2::VPC::Id
+
+  SubnetIds:
+    Description: Subnet ids where the RDS instance will be hosted
+    Type: List<AWS::EC2::Subnet::Id>
+  
+  SecurityStack:
+    Description: Name of an active CloudFormation stack that contains all roles and SGs resources
+    Type: String
+    Default: Ascending-Security
+
+Resources:
+  MyDBParameterGroup:
+    Type: 'AWS::RDS::DBParameterGroup'
+    Properties:
+      Description: PostgreSQL parameter group
+      Family: postgres15
+      Parameters:
+        password_encryption: 'md5'
+        rds.force_ssl: '0'
+
+
+  MyDBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties:
+      DBSubnetGroupDescription: PostgreSQL subnet group
+      SubnetIds: !Ref SubnetIds
+
+  MyDBInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBName: !Ref DBName
+      MasterUsername: !Ref DBUser
+      MasterUserPassword: !Ref DBPassword
+      DBInstanceIdentifier: "mydbinstance"
+      DBInstanceClass: db.t3.micro
+      Engine: postgres
+      AllocatedStorage: 20
+      DBParameterGroupName: !Ref MyDBParameterGroup
+      DBSubnetGroupName: !Ref MyDBSubnetGroup
+      VPCSecurityGroups:
+        - Fn::ImportValue: !Sub ${SecurityStack}-DemoDBSG
+
+Outputs:
+  RDSEndpoint:
+    Description: The endpoint of the RDS instance
+    Value: 
+      Fn::GetAtt: 
+        - MyDBInstance
+        - Endpoint.Address
