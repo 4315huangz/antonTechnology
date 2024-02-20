@@ -7,6 +7,6 @@ ENV PROFILE ${PROFILE}
 EXPOSE 8080
 
 RUN rm -rf /usr/local/tomcat/webapps/ROOT
-COPY ./*.war /usr/local/tomcat/webapps/ANTONROOT.war
+COPY ./*.war /usr/local/tomcat/webapps/ROOT.war
 COPY ./setenv.sh  /usr/local/tomcat/bin/setenv.sh
 RUN echo "Hello"
