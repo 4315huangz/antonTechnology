@@ -50,9 +50,10 @@ Resources:
       DBName: !Ref DBName
       MasterUsername: !Ref DBUser
       MasterUserPassword: !Ref DBPassword
-      DBInstanceIdentifier: "mydbinstance"
+      DBInstanceIdentifier: "mydbinstanceV2"
       DBInstanceClass: db.t3.micro
       Engine: postgres
+      EngineVersion: 15.5
       AllocatedStorage: 20
       DBParameterGroupName: !Ref MyDBParameterGroup
       DBSubnetGroupName: !Ref MyDBSubnetGroup

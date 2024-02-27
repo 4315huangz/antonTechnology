@@ -1,8 +1,6 @@
 package org.antontech.controller;
 
 import org.antontech.dto.ProjectDTO;
-import org.antontech.model.Project;
-import org.antontech.model.User;
 import org.antontech.service.ProjectService;
 import org.antontech.service.UserService;
 import org.slf4j.Logger;
@@ -16,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = {"/project","/projects"})
@@ -29,11 +29,11 @@ public class ProjectController {
     private UserService userService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<List<ProjectDTO>> getProjects(){
+    public ResponseEntity<Set<ProjectDTO>> getProjects(){
         logger.info("I am in getProejcts controller");
-        List<ProjectDTO> projects = projectService.getProjects();
+        Set<ProjectDTO> projects = projectService.getProjects();
         if(projects == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
         }
         return ResponseEntity.ok(projects);
     }

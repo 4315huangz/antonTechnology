@@ -60,7 +60,7 @@ public class UserHibernateDao implements IUserDao {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to get userById via HibernateDao");
         User user=null;
-        String hql = "From User as u WHERE u.userId = :id";
+        String hql = "From User u left join fetch u.projects WHERE u.userId = :id";
         try {
             Session session = sessionFactory.openSession();
             Query<User> query = session.createQuery(hql);

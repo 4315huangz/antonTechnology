@@ -55,13 +55,13 @@ public class User {
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "users_projects",
-            joinColumns = { @JoinColumn(name = "user_id")},
-            inverseJoinColumns = { @JoinColumn(name = "project_id")}
+            joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "user_id")},
+            inverseJoinColumns = { @JoinColumn(name = "project_id", referencedColumnName = "project_id")}
     )
     @JsonIgnore
     private List<Project> projects;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = { @JoinColumn(name = "user_id")},
             inverseJoinColumns = { @JoinColumn(name = "role_id")}

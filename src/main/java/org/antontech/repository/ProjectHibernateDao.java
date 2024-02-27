@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.antontech.util.HibernateUtil;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 @Repository
 public class ProjectHibernateDao implements IProjectDao{
@@ -27,7 +27,7 @@ public class ProjectHibernateDao implements IProjectDao{
         List<Project> projects;
         try {
             Session session = sessionFactory.openSession();
-            String hql = "From Project";
+            String hql = "From Project p left join fetch p.users";
             Query<Project> query = session.createQuery(hql);
             projects = query.list();
             session.close();
@@ -64,7 +64,7 @@ public class ProjectHibernateDao implements IProjectDao{
     public Project getById(long id) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to get projectById in postgres via HibernateDao");
-        String hql = "FROM Project Pr WHERE Pr.projectId = :Id";
+        String hql = "FROM Project p left join fetch p.users WHERE p.projectId = :Id";
         Project project = null;
         try {
             Session session = sessionFactory.openSession();

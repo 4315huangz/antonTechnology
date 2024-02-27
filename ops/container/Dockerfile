@@ -1,5 +1,4 @@
-FROM tomcat:9.0.76-jre17
-
+FROM --platform=linux/amd64 tomcat:9.0.76-jre17
 MAINTAINER YourName
 ARG PROFILE=dev
 ENV PROFILE ${PROFILE}

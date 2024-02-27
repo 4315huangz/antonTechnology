@@ -3,7 +3,6 @@ package org.antontech.service;
 import org.antontech.dto.ProjectDTO;
 import org.antontech.model.Project;
 import org.antontech.model.User;
-import org.antontech.repository.Exception.UserNotFoundException;
 import org.antontech.repository.IProjectDao;
 import org.antontech.repository.IUserDao;
 import org.hibernate.Hibernate;
@@ -11,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -25,11 +25,12 @@ public class ProjectService {
     @Autowired
     private EmailService emailService;
 
-    public List<ProjectDTO> getProjects() {
+    public Set<ProjectDTO> getProjects() {
         List<Project> projects = projectDao.getProjects();
-        return projects.stream()
+        Set<Project> projectsSet = new HashSet<>(projects);
+        return projectsSet.stream()
                 .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     private ProjectDTO convertToDTO(Project project) {
@@ -55,6 +56,8 @@ public class ProjectService {
             User user = userDao.getById(userId);
             if(user == null)
                 throw new IllegalArgumentException("User not found for ID: " + userId);
+            user.getProjects().add(project);
+            userDao.save(user);
             users.add(user);
         }
         project.setUsers(users);
