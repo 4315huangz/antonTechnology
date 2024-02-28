@@ -22,6 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -82,6 +83,8 @@ public class SecurityFilter implements Filter {
             logger.info("===== after parsing JWT token, claims.getId()={}", claims.getId());
             if(claims.getId() != null) {
                 User u = userService.getById(Long.valueOf(claims.getId()));
+                HttpSession session = req.getSession(true);
+                session.setAttribute("loggedInUserId", Long.valueOf(claims.getId()));
                 if(u != null) {
                     List<Role> roles = roleCacheService.getRoles(Long.valueOf(claims.getId()));
                     if (roles == null || roles.isEmpty()) {

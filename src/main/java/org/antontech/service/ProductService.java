@@ -1,6 +1,7 @@
 package org.antontech.service;
 
 import org.antontech.model.Product;
+import org.antontech.model.User;
 import org.antontech.repository.IProductDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import java.util.List;
 public class ProductService {
     @Autowired
     private IProductDao productDao;
+    @Autowired
+    private EmailService emailService;
 
     public List<Product> getProducts() {
         return productDao.getProducts();
@@ -40,5 +43,16 @@ public class ProductService {
 
     public List<Product> searchByDescription(String keyword) {
         return productDao.searchByDescription(keyword);
+    }
+
+    public void notifyAntonTechnology(Product product, User user) {
+        String subject = "Consulting Service Requested";
+        String emailContent = "User: " + user.getUserId() + user.getFirstName() + user.getLastName() + "\n"
+                + "Email: " + user.getEmail() + "\n"
+                + "has requested more details about the following product:\n\n"
+                + "Product ID: " + product.getId() + "\n"
+                + "Product Name: " + product.getName() + "\n"
+                + "Description: " + product.getDescription() + "\n";
+        emailService.notifyAntonTechnology(subject, emailContent);
     }
 }
