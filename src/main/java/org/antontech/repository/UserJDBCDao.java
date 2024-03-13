@@ -1,10 +1,16 @@
 package org.antontech.repository;
 
 import org.antontech.model.User;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +68,6 @@ public class UserJDBCDao implements IUserDao{
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (rs != null) rs.close();
                 if (con != null) con.close();
             } catch (SQLException e) {
                 log.error("Unable to close the JDBC Connection",e);
@@ -134,6 +139,7 @@ public class UserJDBCDao implements IUserDao{
             while (rs.next()) {
                 user.setUserId(rs.getLong("user_id"));
                 user.setUserName(rs.getString("user_name"));
+                user.setPassword(rs.getString("password"));
                 user.setFirstName(rs.getString("first_name"));
                 user.setLastName(rs.getString("last_name"));
                 user.setEmail(rs.getString("email"));
@@ -151,7 +157,6 @@ public class UserJDBCDao implements IUserDao{
             try {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-                if (rs != null) rs.close();
                 if (con != null) con.close();
             } catch (SQLException e) {
                 log.error("Unable to close the JDBC Connection",e);
@@ -162,27 +167,133 @@ public class UserJDBCDao implements IUserDao{
 
     @Override
     public List<User> getByIndustry(String industry) {
-        return null;
+        log.info("Start to get user by industry from postgres via JDBC");
+        List<User>  users = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        log.debug("setup required attributes");
+
+        try {
+            String sql = "select * from users WHERE LOWER(industry) = LOWER(?)";
+            con = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, industry);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getLong("user_id"));
+                user.setUserName(rs.getString("user_name"));
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setEmail(rs.getString("email"));
+                user.setCompanyName(rs.getString("company_name"));
+                user.setAddress(rs.getString("address"));
+                user.setIndustry(rs.getString("industry"));
+                user.setTitle(rs.getString("title"));
+                user.setPhone(rs.getString("phone"));
+                user.setCompanyType(rs.getString("company_type"));
+                users.add(user);
+            }
+            log.info("Connects to DB and execute the select query successfully");
+        } catch (SQLException e) {
+            log.error("Unable to connect to db or execute select all query", e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                log.error("Unable to close the JDBC Connection",e);
+            }
+        }
+        return users;
     }
 
     @Override
     public void updateEmail(long id, String email) {
-
+        log.info("Start to update user email by ID via JDBC");
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "UPDATE users SET email = ? WHERE user_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setString(1, email);
+                stmt.setLong(2, id);
+                int rowAffected = stmt.executeUpdate();
+                if (rowAffected > 0) {
+                    log.info("Successfully updated user email for ID {}", id);
+                } else {
+                    log.warn("No user found with ID {}", id);
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute update", e);
+        }
     }
 
     @Override
     public void updatePassword(long id, String password) {
-
+        log.info("Start to update user password by ID via JDBC");
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "UPDATE users SET password = ? WHERE user_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                String hashedPassword = DigestUtils.md5Hex(password.trim());
+                stmt.setString(1, hashedPassword);
+                stmt.setLong(2, id);
+                int rowAffected = stmt.executeUpdate();
+                if (rowAffected > 0) {
+                    log.info("Successfully updated user password for ID {}", id);
+                } else {
+                    log.warn("No user found with ID {}", id);
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute update", e);
+        }
     }
 
     @Override
     public void updateCompany(long id, String companyName, String address, String industry) {
-
+        log.info("Start to update user company by ID via JDBC");
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "UPDATE users SET company_name = ?, address = ?, industry = ?  WHERE user_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setString(1, companyName);
+                stmt.setString(2, address);
+                stmt.setString(3, industry);
+                stmt.setLong(4, id);
+                int rowAffected = stmt.executeUpdate();
+                if (rowAffected > 0) {
+                    log.info("Successfully updated user company for ID {}", id);
+                } else {
+                    log.warn("No user found with ID {}", id);
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute update", e);
+        }
     }
 
     @Override
     public void updateManager(long id, String firstName, String lastName, String title, String phone) {
-
+        log.info("Start to update user manager by ID via JDBC");
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "UPDATE users SET first_name = ?, last_name = ?, title = ?, phone = ?  WHERE user_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setString(1, firstName);
+                stmt.setString(2, lastName);
+                stmt.setString(3, title);
+                stmt.setString(4, phone);
+                stmt.setLong(5, id);
+                int rowAffected = stmt.executeUpdate();
+                if (rowAffected > 0) {
+                    log.info("Successfully updated user manager for ID {}", id);
+                } else {
+                    log.warn("No user found with ID {}", id);
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute update", e);
+        }
     }
 
     @Override

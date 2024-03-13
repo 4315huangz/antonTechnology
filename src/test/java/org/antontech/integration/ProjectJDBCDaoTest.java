@@ -1,4 +1,5 @@
 package org.antontech.integration;
+import junit.framework.Assert;
 import org.antontech.model.Project;
 import org.antontech.repository.ProjectJDBCDao;
 import org.junit.After;
@@ -35,4 +36,28 @@ public class ProjectJDBCDaoTest {
         assertEquals(1, projectList.size());
     }
 
+    @Test
+    public void getByIdTest() {
+        long newId = project.getProjectId();
+        Project p = projectJDBCDao.getById(newId);
+        assertEquals(newId, (long)p.getProjectId());
+    }
+
+    @Test
+    public void updateDescriptionTest() {
+        String newDes = "New description";
+        long projectIdToBeUpdated = project.getProjectId();
+        projectJDBCDao.updateDescription(projectIdToBeUpdated, newDes);
+        String actual = projectJDBCDao.getById(projectIdToBeUpdated).getDescription();
+        Assert.assertEquals(newDes, actual);
+    }
+
+    @Test
+    public void updateManagerTest() {
+        String newManager = "John Jake";
+        long projectIdToBeUpdated = project.getProjectId();
+        projectJDBCDao.updateManager(projectIdToBeUpdated, newManager);
+        String actual = projectJDBCDao.getById(projectIdToBeUpdated).getManager();
+        Assert.assertEquals(newManager, actual);
+    }
 }

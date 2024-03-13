@@ -107,17 +107,71 @@ public class ProjectJDBCDao implements IProjectDao {
 
     @Override
     public Project getById(long id) {
-        return null;
+        log.info("Start to get Project by ID from postgres via JDBC");
+        Project project = new Project();
+
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "SELECT * FROM projects WHERE project_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setLong(1, id);
+                try(ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        long projectId = rs.getLong("project_id");
+                        Date startDate = rs.getDate("start_date");
+                        String description = rs.getString("description");
+                        String manager = rs.getString("manager");
+                        log.info("Get project attributes and translate to java object " + projectId);
+                        project.setProjectId(projectId);
+                        project.setStartDate(startDate);
+                        project.setDescription(description);
+                        project.setManager(manager);
+                    }
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute select query", e);
+        }
+        return project;
     }
 
     @Override
     public void updateDescription(long id, String description) {
-
+        log.info("Start to update Project description by ID via JDBC");
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "UPDATE projects SET description = ? WHERE project_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setString(1, description);
+                stmt.setLong(2, id);
+                int rowAffected = stmt.executeUpdate();
+                if (rowAffected > 0) {
+                    log.info("Successfully updated project description for ID {}", id);
+                } else {
+                    log.warn("No project found with ID {}", id);
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute update", e);
+        }
     }
 
     @Override
     public void updateManager(long id, String manager) {
-
+        log.info("Start to update Project manager by ID via JDBC");
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "UPDATE projects SET manager = ? WHERE project_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setString(1, manager);
+                stmt.setLong(2, id);
+                int rowAffected = stmt.executeUpdate();
+                if (rowAffected > 0) {
+                    log.info("Successfully updated project manager for ID {}", id);
+                } else {
+                    log.warn("No project found with ID {}", id);
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute update", e);
+        }
     }
 
     @Override

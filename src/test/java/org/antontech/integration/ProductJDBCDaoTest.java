@@ -1,7 +1,6 @@
 package org.antontech.integration;
 
 import org.antontech.model.Product;
-import org.antontech.model.User;
 import org.antontech.repository.ProductJDBCDao;
 import org.antontech.repository.UserJDBCDao;
 import org.junit.After;
@@ -35,14 +34,37 @@ public class ProductJDBCDaoTest {
     @Test
     public void getProductsTest() {
         List<Product> productList = productJDBCDao.getProducts();
-        assertEquals(1, productList.size());
+        assertEquals(2, productList.size());
+    }
+
+    @Test
+    public void getByIdTest() {
+        Product p = productJDBCDao.getById(1);
+        assertEquals(1, p.getId());
+    }
+
+    @Test
+    public void updateNameTest() {
+        String newName = "New name";
+        long productIdToBeUpdated = product.getId();
+        productJDBCDao.updateName(productIdToBeUpdated, newName);
+        String actual = productJDBCDao.getById(productIdToBeUpdated).getName();
+        assertEquals(newName, actual);
+    }
+
+    @Test
+    public void updateDescriptionTest() {
+        String newDes = "New description";
+        long productIdToBeUpdated = product.getId();
+        productJDBCDao.updateDescription(productIdToBeUpdated, newDes);
+        String actual = productJDBCDao.getById(productIdToBeUpdated).getDescription();
+        assertEquals(newDes, actual);
     }
 
     @Test
     public void searchByDescriptionKeywordTest() {
-        List<Product> productList = productJDBCDao.searchByDescription("Test");
+        List<Product> productList = productJDBCDao.searchByDescription("Tested");
         assertEquals(1, productList.size());
-
     }
 
 }

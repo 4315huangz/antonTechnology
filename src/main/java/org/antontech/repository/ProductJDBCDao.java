@@ -4,7 +4,12 @@ import org.antontech.model.Product;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +53,6 @@ public class ProductJDBCDao implements IProductDao {
                 try {
                     if(rs != null) rs.close();
                     if(stmt != null) stmt.close();
-                    if(rs != null) rs.close();
                     if(con != null) con.close();
                 } catch (SQLException e) {
                     log.error("Unable to close the JDBC Connection",e);
@@ -97,17 +101,69 @@ public class ProductJDBCDao implements IProductDao {
 
     @Override
     public Product getById(long id) {
-        return null;
+        log.info("Start to get Product by ID from postgres via JDBC");
+        Product product = new Product();
+
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "SELECT * FROM products WHERE product_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setLong(1, id);
+                try(ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        long productId = rs.getLong("product_id");
+                        String name = rs.getString("name");
+                        String description = rs.getString("description");
+                        log.info("Get product attributes and translate to java object " + productId);
+                        product.setId(productId);
+                        product.setName(name);
+                        product.setDescription(description);
+                    }
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute select query", e);
+        }
+        return product;
     }
 
     @Override
     public void updateName(long id, String name) {
-
+        log.info("Start to update Product name by ID via JDBC");
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "UPDATE products SET name = ? WHERE product_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setString(1, name);
+                stmt.setLong(2, id);
+                int rowAffected = stmt.executeUpdate();
+                if (rowAffected > 0) {
+                    log.info("Successfully updated product name for ID {}", id);
+                } else {
+                    log.warn("No product found with ID {}", id);
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute update", e);
+        }
     }
 
     @Override
     public void updateDescription(long id, String description) {
-
+        log.info("Start to update Product description by ID via JDBC");
+        try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            String sql = "UPDATE products SET description = ? WHERE product_id = ?";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setString(1, description);
+                stmt.setLong(2, id);
+                int rowAffected = stmt.executeUpdate();
+                if (rowAffected > 0) {
+                    log.info("Successfully updated product description for ID {}", id);
+                } else {
+                    log.warn("No product found with ID {}", id);
+                }
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute update", e);
+        }
     }
 
     @Override
@@ -177,7 +233,6 @@ public class ProductJDBCDao implements IProductDao {
             try {
                 if(rs != null) rs.close();
                 if(stmt != null) stmt.close();
-                if(rs != null) rs.close();
                 if(con != null) con.close();
             } catch (SQLException e) {
                 log.error("Unable to close the JDBC Connection",e);
