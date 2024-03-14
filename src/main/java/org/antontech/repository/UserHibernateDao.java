@@ -1,7 +1,7 @@
 package org.antontech.repository;
 
 import org.antontech.model.User;
-import org.antontech.repository.Exception.UserNotFoundException;
+import org.antontech.repository.Exception.UserDaoException;
 import org.hibernate.*;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class UserHibernateDao implements IUserDao {
             return users;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception", e);
-            throw e;
+            throw new UserDaoException("Failed to get users", e);
         }
     }
 
@@ -50,7 +50,7 @@ public class UserHibernateDao implements IUserDao {
                 transaction.rollback();
             }
             logger.error("Failed to save user ${}", user);
-            throw e;
+            throw new UserDaoException("Failed to save user", e);
         }
 
     }
@@ -70,7 +70,7 @@ public class UserHibernateDao implements IUserDao {
             return  user;
         } catch (HibernateException e) {
             logger.error("Unable to get user by user_id = {}", id, e);
-            throw e;
+            throw new UserDaoException("Failed to get user", e);
         }
     }
 
@@ -89,7 +89,7 @@ public class UserHibernateDao implements IUserDao {
             return  users;
         } catch (HibernateException e) {
             logger.error("Unable to get users by industry = {}", industry, e);
-            throw e;
+            throw new UserDaoException("Failed to get user", e);
         }
     }
 
@@ -113,7 +113,7 @@ public class UserHibernateDao implements IUserDao {
                 transaction.rollback();
             }
             logger.error("Failed to update user email for {}", id, e);
-            throw e;
+            throw new UserDaoException("Failed to update user email", e);
         }
     }
 
@@ -137,7 +137,7 @@ public class UserHibernateDao implements IUserDao {
                 transaction.rollback();
             }
             logger.error("Failed to update user password for {}", id, e);
-            throw e;
+            throw new UserDaoException("Failed to update user password", e);
         }
     }
 
@@ -164,7 +164,7 @@ public class UserHibernateDao implements IUserDao {
                 transaction.rollback();
             }
             logger.error("Failed to update user company information for {}", id, e);
-            throw e;
+            throw new UserDaoException("Failed to update user company", e);
         }
     }
 
@@ -192,7 +192,7 @@ public class UserHibernateDao implements IUserDao {
                 transaction.rollback();
             }
             logger.error("Failed to update user's manager information for ${}", id, e);
-            throw e;
+            throw new UserDaoException("Failed to update user manager", e);
         }
     }
 
@@ -216,7 +216,7 @@ public class UserHibernateDao implements IUserDao {
                 transaction.rollback();
             }
             logger.error("Unable to delete user id = {}", id, e);
-            throw e;
+            throw new UserDaoException("Failed to delete user", e);
         }
     }
 
@@ -235,7 +235,7 @@ public class UserHibernateDao implements IUserDao {
             return query.uniqueResult();
         } catch (Exception e) {
             logger.error("error: {}", e.getMessage());
-            throw new UserNotFoundException("Can't find user with email = " + email + ", password = " + password);
+            throw new UserDaoException("Failed to find the user for given email and password", e);
         }
     }
 }

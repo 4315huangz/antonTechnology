@@ -1,6 +1,7 @@
 package org.antontech.repository;
 
 import org.antontech.model.Product;
+import org.antontech.repository.Exception.ProductDaoException;
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
@@ -33,7 +34,7 @@ public class ProductHibernateDao implements IProductDao {
             return products;
         } catch (HibernateException e) {
             log.error("Open session exception or close session exception", e);
-            throw e;
+            throw new ProductDaoException("Failed to get products", e);
         }
     }
 
@@ -52,7 +53,7 @@ public class ProductHibernateDao implements IProductDao {
             return product;
         } catch (HibernateException e) {
             log.error("Unable to get product by product id = {}", id, e);
-            throw e;
+            throw new ProductDaoException("Unable to get product", e);
         }
     }
 
@@ -74,7 +75,7 @@ public class ProductHibernateDao implements IProductDao {
                 transaction.rollback();
             }
             log.error("Failed to save product {}", product);
-            throw e;
+            throw new ProductDaoException("Failed to save product", e);
         }
     }
 
@@ -99,7 +100,7 @@ public class ProductHibernateDao implements IProductDao {
                 transaction.rollback();
             }
             log.error("Failed to update product name for {}", id, e);
-            throw e;
+            throw new ProductDaoException("Failed to update product name", e);
         }
     }
 
@@ -124,7 +125,7 @@ public class ProductHibernateDao implements IProductDao {
                 transaction.rollback();
             }
             log.error("Failed to update product description for {}", id, e);
-            throw e;
+            throw new ProductDaoException("Failed to update product description", e);
         }
 
     }
@@ -150,7 +151,7 @@ public class ProductHibernateDao implements IProductDao {
                 transaction.rollback();
             }
             log.error("Unable to delete product id = {}", id, e);
-            throw e;
+            throw new ProductDaoException("Failed to delete product", e);
         }
     }
 
@@ -172,7 +173,7 @@ public class ProductHibernateDao implements IProductDao {
             return products;
         } catch (HibernateException e) {
             log.error("Unable to search products by keyword = {}", keyword, e);
-            throw e;
+            throw new ProductDaoException("Failed to get products", e);
         }
     }
 }

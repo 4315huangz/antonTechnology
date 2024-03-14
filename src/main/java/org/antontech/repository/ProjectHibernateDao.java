@@ -3,6 +3,7 @@ package org.antontech.repository;
 import org.antontech.dto.ProjectDTO;
 import org.antontech.model.User;
 import org.antontech.model.Project;
+import org.antontech.repository.Exception.ProjectDaoException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,7 +35,7 @@ public class ProjectHibernateDao implements IProjectDao{
             return projects;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception", e);
-            throw e;
+            throw new ProjectDaoException("Failed to get projects", e);
         }
     }
 
@@ -56,7 +57,7 @@ public class ProjectHibernateDao implements IProjectDao{
                 transaction.rollback();
             }
             logger.error("Failed to save project ${}", project);
-            throw e;
+            throw new ProjectDaoException("Failed to save project", e);
         }
     }
 
@@ -75,7 +76,7 @@ public class ProjectHibernateDao implements IProjectDao{
             return project;
         } catch (HibernateException e) {
             logger.error("Unable to get project by project id = {}", id, e);
-            throw e;
+            throw new ProjectDaoException("Failed to get project", e);
         }
     }
 
@@ -100,7 +101,7 @@ public class ProjectHibernateDao implements IProjectDao{
                 transaction.rollback();
             }
             logger.error("Failed to update project description for {}", id, e);
-            throw e;
+            throw new ProjectDaoException("Failed to update project description", e);
         }
     }
 
@@ -125,7 +126,7 @@ public class ProjectHibernateDao implements IProjectDao{
                 transaction.rollback();
             }
             logger.error("Failed to update project manager for {}", id, e);
-            throw e;
+            throw new ProjectDaoException("Failed to update project manager", e);
         }
     }
 
@@ -150,7 +151,7 @@ public class ProjectHibernateDao implements IProjectDao{
                 transaction.rollback();
             }
             logger.error("Unable to delete project id = {}", id, e);
-            throw e;
+            throw new ProjectDaoException("Failed to delete project", e);
         }
     }
 }
