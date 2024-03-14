@@ -2,6 +2,7 @@ package org.antontech.repository;
 
 import org.antontech.model.Product;
 import org.antontech.model.Role;
+import org.antontech.repository.Exception.RoleDaoException;
 import org.antontech.util.HibernateUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -30,7 +31,7 @@ public class RoleHibernateDao implements IRoleDao {
             return roles;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
-            throw e;
+            throw new RoleDaoException("Failed to get roles", e);
         }
     }
 
@@ -49,7 +50,7 @@ public class RoleHibernateDao implements IRoleDao {
             return role;
         } catch (HibernateException e) {
             logger.error("Unable to get role by role id = {}", id, e);
-            throw e;
+            throw new RoleDaoException("Failed to get role", e);
         }
     }
 
@@ -71,7 +72,7 @@ public class RoleHibernateDao implements IRoleDao {
                 transaction.rollback();
             }
             logger.error("Failed to save role {}", role);
-            throw e;
+            throw new RoleDaoException("Failed to save role", e);
         }
     }
 
@@ -96,7 +97,7 @@ public class RoleHibernateDao implements IRoleDao {
                 transaction.rollback();
             }
             logger.error("Unable to delete role id = {}", role.getId(), e);
-            throw e;
+            throw new RoleDaoException("Failed to delete role", e);
         }
     }
 
@@ -114,7 +115,7 @@ public class RoleHibernateDao implements IRoleDao {
             return allowedResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
-            throw e;
+            throw new RoleDaoException("Failed to get allowed resources", e);
         }
     }
 
@@ -132,7 +133,7 @@ public class RoleHibernateDao implements IRoleDao {
             return allowedReadResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
-            throw e;
+            throw new RoleDaoException("Failed to get allowed read resources", e);
         }
     }
 
@@ -150,7 +151,7 @@ public class RoleHibernateDao implements IRoleDao {
             return allowedCreateResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
-            throw e;
+            throw new RoleDaoException("Failed to get allowed create resources", e);
         }
     }
 
@@ -168,7 +169,7 @@ public class RoleHibernateDao implements IRoleDao {
             return allowedUpdateResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
-            throw e;
+            throw new RoleDaoException("Failed to get allowed update resources", e);
         }
     }
 
@@ -186,7 +187,7 @@ public class RoleHibernateDao implements IRoleDao {
             return allowedDeleteResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
-            throw e;
+            throw new RoleDaoException("Failed to get allowed delete resources", e);
         }
     }
 }

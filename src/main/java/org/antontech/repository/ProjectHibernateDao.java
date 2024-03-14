@@ -1,7 +1,5 @@
 package org.antontech.repository;
 
-import org.antontech.dto.ProjectDTO;
-import org.antontech.model.User;
 import org.antontech.model.Project;
 import org.antontech.repository.Exception.ProjectDaoException;
 import org.hibernate.HibernateException;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Repository;
 import org.antontech.util.HibernateUtil;
 
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public class ProjectHibernateDao implements IProjectDao{
