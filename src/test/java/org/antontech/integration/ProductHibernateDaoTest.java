@@ -29,35 +29,36 @@ public class ProductHibernateDaoTest {
     @Before
     public void setup(){
         user = new User();
-        user.setUserName("testUser");
+        user.setUserName("zjiang");
         user.setPassword("12345678");
-        user.setFirstName("Jack");
-        user.setLastName("John");
-        user.setEmail("test@emai.com");
-        user.setCompanyName("ABC INC");
-        user.setAddress("Milwaukee,Wisconsin");
+        user.setFirstName("Zhi");
+        user.setLastName("Jiang");
+        user.setEmail("jiang@gmail.com");
+        user.setCompanyName("Marquette University");
+        user.setAddress("Milwaukee, Wisconsin");
         user.setIndustry("Auto");
-        user.setTitle("Manager");
-        user.setPhone("000-000-0000");
-        user.setCompanyType("Supplier");
+        user.setTitle("Associate");
+        user.setPhone("888-777-66666");
+        user.setCompanyType("OEM");
         userHibernateDao.save(user);
         product = new Product();
-        product.setName("TestProduct");
-        product.setDescription("Test description");
+        product.setName("Seating");
+        product.setDescription("The auto seating supplier");
         product.setUser(user);
         productHibernateDao.save(product);
     }
 
     @After
     public void teardown(){
-        userHibernateDao.delete(user.getUserId());
         productHibernateDao.delete(product.getId());
+        userHibernateDao.delete(user.getUserId());
+
     }
 
     @Test
     public void getProductsTest() {
         List<Product> products = productHibernateDao.getProducts();
-        assertEquals(1, products.size());
+        assertEquals(2, products.size());
     }
 
     @Test

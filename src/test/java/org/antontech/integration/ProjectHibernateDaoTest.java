@@ -33,17 +33,17 @@ public class ProjectHibernateDaoTest {
     @Before
     public void setup(){
         user = new User();
-        user.setUserName("testUser");
+        user.setUserName("Michelle2024");
         user.setPassword("12345678");
-        user.setFirstName("Jack");
-        user.setLastName("John");
-        user.setEmail("test@emai.com");
-        user.setCompanyName("ABC INC");
-        user.setAddress("Milwaukee,Wisconsin");
-        user.setIndustry("Auto");
-        user.setTitle("Manager");
+        user.setFirstName("Michelle");
+        user.setLastName("White");
+        user.setEmail("michelle@emai.com");
+        user.setCompanyName("Google INC");
+        user.setAddress("Texas");
+        user.setIndustry("Bank");
+        user.setTitle("Teller");
         user.setPhone("000-000-0000");
-        user.setCompanyType("Supplier");
+        user.setCompanyType("OEM");
         userHibernateDao.save(user);
 
         project = new Project();
@@ -55,8 +55,8 @@ public class ProjectHibernateDaoTest {
 
     @After
     public  void teardown(){
-        userHibernateDao.delete(user.getUserId());
         projectHibernateDao.delete(project.getProjectId());
+        userHibernateDao.delete(user.getUserId());
     }
 
     @Test
