@@ -24,10 +24,10 @@ public class UserHibernateDaoTest {
 
     @Before
     public void setup() {
-        user.setUserName("testUser");
+        user.setUserName("Michelle");
         user.setPassword("12345678");
-        user.setFirstName("Jack");
-        user.setLastName("John");
+        user.setFirstName("Michelle");
+        user.setLastName("Mayer");
         user.setEmail("test@emai.com");
         user.setCompanyName("ABC INC");
         user.setAddress("Milwaukee,Wisconsin");

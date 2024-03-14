@@ -32,7 +32,7 @@ public class ProjectHibernateDao implements IProjectDao{
             return projects;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception", e);
-            throw new ProjectDaoException("Failed to get projects", e);
+            throw new ProjectDaoException("Failed to get projects due to unexpected error", e);
         }
     }
 
@@ -54,7 +54,7 @@ public class ProjectHibernateDao implements IProjectDao{
                 transaction.rollback();
             }
             logger.error("Failed to save project ${}", project);
-            throw new ProjectDaoException("Failed to save project", e);
+            throw new ProjectDaoException("Failed to save project due to unexpected exception", e);
         }
     }
 
@@ -73,7 +73,7 @@ public class ProjectHibernateDao implements IProjectDao{
             return project;
         } catch (HibernateException e) {
             logger.error("Unable to get project by project id = {}", id, e);
-            throw new ProjectDaoException("Failed to get project", e);
+            throw new ProjectDaoException("Failed to get project due to unexpected exception: " + e.getMessage(), e);
         }
     }
 
@@ -98,7 +98,7 @@ public class ProjectHibernateDao implements IProjectDao{
                 transaction.rollback();
             }
             logger.error("Failed to update project description for {}", id, e);
-            throw new ProjectDaoException("Failed to update project description", e);
+            throw new ProjectDaoException("Failed to update project description due to unexpected exception" + e.getMessage(), e);
         }
     }
 
@@ -123,7 +123,7 @@ public class ProjectHibernateDao implements IProjectDao{
                 transaction.rollback();
             }
             logger.error("Failed to update project manager for {}", id, e);
-            throw new ProjectDaoException("Failed to update project manager", e);
+            throw new ProjectDaoException("Failed to update project manager due to unexpected exception" + e.getMessage(), e);
         }
     }
 
@@ -148,7 +148,7 @@ public class ProjectHibernateDao implements IProjectDao{
                 transaction.rollback();
             }
             logger.error("Unable to delete project id = {}", id, e);
-            throw new ProjectDaoException("Failed to delete project", e);
+            throw new ProjectDaoException("Failed to delete project due to unexpected exception" + e.getMessage(), e);
         }
     }
 }

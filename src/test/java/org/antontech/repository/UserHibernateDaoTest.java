@@ -1,6 +1,7 @@
 package org.antontech.repository;
 
 import org.antontech.model.User;
+import org.antontech.repository.Exception.UserDaoException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -8,6 +9,7 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -31,49 +33,40 @@ public class UserHibernateDaoTest {
     Transaction mockTransaction;
     @Mock
     Query mockQuery;
+    @InjectMocks
+    UserHibernateDao userDao;
 
-    @Test
-    public void getUsersTest() {
-    IUserDao userDao = new UserHibernateDao();
     User user = new User(5, "testUser", "testPassword", "Amy", "Michele",
             "amymichele@gmail.com","ABC Inc","US","Consulting","Manger",
             "999-999-9999","OEM");
     List<User> res = List.of(user);
+
+    @Test
+    public void getUsersTest() {
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
             when(mockQuery.list()).thenReturn(res);
             doNothing().when(mockSession).close();
-
-            List<User> actualRes = userDao.getUsers();
-            assertEquals(res, actualRes);
+            assertEquals(res, userDao.getUsers());
         }
     }
 
-    @Test
+    @Test(expected = UserDaoException.class)
     public void getUsersTest_getHibernateException_throwHibernateException(){
-        IUserDao userDao = new UserHibernateDao();
-        User user = new User(5, "testUser", "testPassword", "Amy", "Michele",
-                "amymichele@gmail.com","ABC Inc","US","Consulting","Manger",
-                "999-999-9999","OEM");
-        List<User> res = List.of(user);
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
             when(mockQuery.list()).thenReturn(res);
-            doThrow(HibernateException.class).when(mockSession).close();
-            assertThrows(HibernateException.class, () -> userDao.getUsers());
+            doThrow(UserDaoException.class).when(mockSession).close();
+            userDao.getUsers();
         }
     }
 
     @Test
     public void save_happyPass() {
-        IUserDao userDao = new UserHibernateDao();
-        User user = new User(5, "testUser", "testPassword", "Amy", "Michele",
-                "amymichele@gmail.com","ABC Inc","US","Consulting","Manger",
-                "999-999-9999","OEM");
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
@@ -87,10 +80,6 @@ public class UserHibernateDaoTest {
 
     @Test
     public void getByIdTest() {
-        IUserDao userDao = new UserHibernateDao();
-        User user = new User(5, "testUser", "testPassword", "Amy", "Michele",
-                "amymichele@gmail.com", "ABC Inc", "US", "Consulting", "Manger",
-                "999-999-9999", "OEM");
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
@@ -105,11 +94,6 @@ public class UserHibernateDaoTest {
 
     @Test
     public void getByIndustryTest() {
-        IUserDao userDao = new UserHibernateDao();
-        User user = new User(5, "testUser", "testPassword", "Amy", "Michele",
-                "amymichele@gmail.com","ABC Inc","US","Consulting","Manger",
-                "999-999-9999","OEM");
-        List<User> res = List.of(user);
         String industry = "Consulting";
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
@@ -125,7 +109,6 @@ public class UserHibernateDaoTest {
 
     @Test
     public void updateEmailTest(){
-        IUserDao userDao = new UserHibernateDao();
         long id=5;
         String newEmail = "amymichele@update.com";
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
@@ -133,8 +116,8 @@ public class UserHibernateDaoTest {
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.beginTransaction()).thenReturn(mockTransaction);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("email"), anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyLong())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyString())).thenReturn(mockQuery);
             when(mockQuery.executeUpdate()).thenReturn(1);
             doNothing().when(mockTransaction).commit();
             doNothing().when(mockSession).close();
@@ -151,7 +134,6 @@ public class UserHibernateDaoTest {
 
     @Test
     public void updatePasswordTest(){
-        IUserDao userDao = new UserHibernateDao();
         long id=5;
         String newPW = "updatedPassword";
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
@@ -159,8 +141,8 @@ public class UserHibernateDaoTest {
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.beginTransaction()).thenReturn(mockTransaction);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("password"), anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyLong())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyString())).thenReturn(mockQuery);
             when(mockQuery.executeUpdate()).thenReturn(1);
             doNothing().when(mockTransaction).commit();
             doNothing().when(mockSession).close();
@@ -177,7 +159,6 @@ public class UserHibernateDaoTest {
 
     @Test
     public void updateCompanyTest(){
-        IUserDao userDao = new UserHibernateDao();
         long id=5;
         String newCompany = "Company LLC";
         String newAddress = "CN";
@@ -187,10 +168,10 @@ public class UserHibernateDaoTest {
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.beginTransaction()).thenReturn(mockTransaction);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("companyName"), anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("Address"), anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("industry"),anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyLong())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(),anyString())).thenReturn(mockQuery);
             when(mockQuery.executeUpdate()).thenReturn(1);
             doNothing().when(mockTransaction).commit();
             doNothing().when(mockSession).close();
@@ -207,7 +188,6 @@ public class UserHibernateDaoTest {
 
     @Test
     public void updateManagerTest(){
-        IUserDao userDao = new UserHibernateDao();
         long id=5;
         String newFirstName = "Jack";
         String newLastName = "John";
@@ -218,11 +198,11 @@ public class UserHibernateDaoTest {
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.beginTransaction()).thenReturn(mockTransaction);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("firstName"), anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("lastName"), anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("title"),anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("phone"),anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyLong())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(),anyString())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(),anyString())).thenReturn(mockQuery);
             when(mockQuery.executeUpdate()).thenReturn(1);
             doNothing().when(mockTransaction).commit();
             doNothing().when(mockSession).close();
@@ -239,14 +219,13 @@ public class UserHibernateDaoTest {
 
     @Test
     public void deleteTest(){
-        IUserDao userDao = new UserHibernateDao();
         long id=5;
         try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.beginTransaction()).thenReturn(mockTransaction);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
+            when(mockQuery.setParameter(anyString(), anyLong())).thenReturn(mockQuery);
             when(mockQuery.executeUpdate()).thenReturn(1);
             doNothing().when(mockTransaction).commit();
             doNothing().when(mockSession).close();

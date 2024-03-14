@@ -1,5 +1,7 @@
 package org.antontech.model;
 
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -12,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "roles")
+@NoArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +35,16 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
+
+    public Role(long id, String name, String allowedResource, boolean allowedRead, boolean allowedCreate, boolean allowedUpdate, boolean allowedDelete) {
+        this.id = id;
+        this.name = name;
+        this.allowedResource = allowedResource;
+        this.allowedRead = allowedRead;
+        this.allowedCreate = allowedCreate;
+        this.allowedUpdate = allowedUpdate;
+        this.allowedDelete = allowedDelete;
+    }
 
     public long getId() {
         return id;

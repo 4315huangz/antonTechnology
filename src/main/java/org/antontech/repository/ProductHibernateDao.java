@@ -33,8 +33,8 @@ public class ProductHibernateDao implements IProductDao {
             session.close();
             return products;
         } catch (HibernateException e) {
-            log.error("Open session exception or close session exception", e);
-            throw new ProductDaoException("Failed to get products", e);
+            log.error("Unexpected exception occurred", e);
+            throw new ProductDaoException("Failed to get products due to unexpected error", e);
         }
     }
 
@@ -52,8 +52,8 @@ public class ProductHibernateDao implements IProductDao {
             session.close();
             return product;
         } catch (HibernateException e) {
-            log.error("Unable to get product by product id = {}", id, e);
-            throw new ProductDaoException("Unable to get product", e);
+        log.error("Unexpected exception occurred", e);
+        throw new ProductDaoException("Failed to get product due to unexpected error", e);
         }
     }
 
@@ -70,12 +70,12 @@ public class ProductHibernateDao implements IProductDao {
             session.close();
             return true;
         } catch (HibernateException e) {
-            if( transaction != null ){
+            if (transaction != null) {
                 log.error("Save transaction failed, rollback.");
                 transaction.rollback();
             }
             log.error("Failed to save product {}", product);
-            throw new ProductDaoException("Failed to save product", e);
+            throw new ProductDaoException("Failed to save product due to unexpected error", e);
         }
     }
 
