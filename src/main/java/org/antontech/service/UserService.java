@@ -1,7 +1,6 @@
 package org.antontech.service;
 
 import org.antontech.model.User;
-import org.antontech.repository.IUserDao;
 import org.antontech.repository.UserHibernateDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

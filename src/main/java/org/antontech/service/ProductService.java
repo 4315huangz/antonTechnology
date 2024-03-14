@@ -16,6 +16,7 @@ public class ProductService {
     private IProductDao productDao;
     @Autowired
     private EmailService emailService;
+    private Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public List<Product> getProducts() {
         return productDao.getProducts();

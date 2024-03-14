@@ -2,7 +2,6 @@ package org.antontech.service;
 
 import org.antontech.model.Role;
 import org.antontech.repository.IRoleDao;
-import org.antontech.repository.RoleHibernateDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
