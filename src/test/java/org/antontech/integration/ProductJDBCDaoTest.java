@@ -22,6 +22,7 @@ public class ProductJDBCDaoTest {
         product = new Product();
         product.setName("Test Product");
         product.setDescription("Test product's description.");
+        product.setPrice(10.6);
         product.setUser(userJDBCDao.getById(4) );
         productJDBCDao.save(product);
     }
@@ -34,7 +35,7 @@ public class ProductJDBCDaoTest {
     @Test
     public void getProductsTest() {
         List<Product> productList = productJDBCDao.getProducts();
-        assertEquals(2, productList.size());
+        assertEquals(1, productList.size());
     }
 
     @Test

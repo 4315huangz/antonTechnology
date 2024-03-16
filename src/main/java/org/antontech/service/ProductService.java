@@ -1,14 +1,19 @@
 package org.antontech.service;
 
+import org.antontech.dto.ProductDTO;
+import org.antontech.dto.ProductDTOMapper;
+import org.antontech.dto.UserDTO;
 import org.antontech.model.Product;
 import org.antontech.model.User;
 import org.antontech.repository.IProductDao;
+import org.antontech.service.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -16,14 +21,23 @@ public class ProductService {
     private IProductDao productDao;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private ProductDTOMapper productDTOMapper;
     private Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public List<Product> getProducts() {
-        return productDao.getProducts();
+    public List<ProductDTO> getProducts() {
+        return productDao.getProducts()
+                .stream()
+                .map(productDTOMapper)
+                .collect(Collectors.toList());
     }
 
-    public Product getById(long id) {
-        return productDao.getById(id);
+    public ProductDTO getById(long id) {
+        Product p = productDao.getById(id);
+        if(p != null)
+            return productDTOMapper.apply(p);
+        else
+            throw new ResourceNotFoundException("Product with id " + id + " not found");
     }
 
     public boolean save(Product p) {
@@ -42,18 +56,24 @@ public class ProductService {
         productDao.delete(id);
     }
 
-    public List<Product> searchByDescription(String keyword) {
-        return productDao.searchByDescription(keyword);
+    public List<ProductDTO> searchByDescription(String keyword) {
+        return productDao.searchByDescription(keyword)
+                .stream().map(productDTOMapper)
+                .collect(Collectors.toList());
     }
 
-    public void notifyAntonTechnology(Product product, User user) {
+    public void notifyAntonTechnology(ProductDTO productDto, UserDTO user) {
         String subject = "Consulting Service Requested";
-        String emailContent = "User: " + user.getUserId() + user.getFirstName() + user.getLastName() + "\n"
+        String emailContent = "The User: " + user.getId() + "\n"
+                + "Name: " + user.getName()
                 + "Email: " + user.getEmail() + "\n"
+                + "From Company: " + user.getCompany() + "\n"
                 + "has requested more details about the following product:\n\n"
-                + "Product ID: " + product.getId() + "\n"
-                + "Product Name: " + product.getName() + "\n"
-                + "Description: " + product.getDescription() + "\n";
+                + "Product ID: " + productDto.getId() + "\n"
+                + "Product Name: " + productDto.getName() + "\n"
+                + "Description: " + productDto.getDescription() + "\n"
+                + "Company: " + productDto.getCompany() + "\n"
+                + "Industry: " + productDto.getIndustry();
         emailService.notifyAntonTechnology(subject, emailContent);
     }
 }

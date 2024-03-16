@@ -1,8 +1,10 @@
 package org.antontech.controller;
 
 import org.antontech.dto.ProjectDTO;
+import org.antontech.dto.UserDTO;
 import org.antontech.service.ProjectService;
 import org.antontech.service.UserService;
+import org.antontech.service.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -30,7 +31,7 @@ public class ProjectController {
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<Set<ProjectDTO>> getProjects(){
-        logger.info("I am in getProejcts controller");
+        logger.debug("I am in get Projects controller");
         Set<ProjectDTO> projects = projectService.getProjects();
         if(projects == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
@@ -49,11 +50,50 @@ public class ProjectController {
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public ResponseEntity getProjectById(@PathVariable(name = "id")long id){
-        ProjectDTO p = projectService.getById(id);
-        if(p == null) {
+        logger.info("Search project in project controller");
+        try {
+            ProjectDTO p = projectService.getById(id);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(p);
+        } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project with ID " + id + " is not found");
         }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(p);
+    }
+
+    @RequestMapping(value = "/addMember/{projectId}/{userId}", method = RequestMethod.PATCH)
+    public ResponseEntity addProjectParticipates(@PathVariable(name = "projectId") long projectId, @PathVariable (name = "userId") long userId) {
+        logger.info("Add team member id = {} to project id = {}", userId, projectId);
+        if (getProjectById(projectId).getStatusCode() == HttpStatus.ACCEPTED) {
+            if (getUserById(userId).getStatusCode() == HttpStatus.ACCEPTED) {
+                projectService.addProjectParticipates(projectId, userId);
+                return ResponseEntity.ok().body("User id = " + userId + " is added to project id " + projectId + " successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + userId + " not found");
+            }
+        } else
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project with ID " + projectId + " is not found, fail to add team member");
+    }
+
+    @RequestMapping(value = "/removeMember/{projectId}/{userId}", method = RequestMethod.PATCH)
+    public ResponseEntity removeProjectParticipates(@PathVariable(name = "projectId") long projectId, @PathVariable (name = "userId") long userId) {
+        logger.info("Remove team member id = {} from project id = {}", userId, projectId);
+        if (getProjectById(projectId).getStatusCode() == HttpStatus.ACCEPTED) {
+            if (getUserById(userId).getStatusCode() == HttpStatus.ACCEPTED) {
+                projectService.deleteProjectParticipates(projectId, userId);
+                return ResponseEntity.ok().body("User id = " + userId + " is removed from project id " + projectId + " successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + userId + " not found");
+            }
+        } else
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project with ID " + projectId + " is not found, fail to remove team member");
+    }
+
+    private ResponseEntity<UserDTO> getUserById(long id) {
+        try {
+            UserDTO u = userService.getUserDTOById(id);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(u);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @RequestMapping(value = "/changeDescription/{id}", params = {"description"}, method = RequestMethod.PATCH)

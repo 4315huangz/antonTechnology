@@ -49,7 +49,5 @@ public class EmailService {
         } catch (Exception e) {
             logger.error("The notification was not send. Error message: " + e.getMessage());
         }
-
     }
-
 }

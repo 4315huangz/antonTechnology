@@ -1,33 +1,52 @@
 package org.antontech.service;
 
+import org.antontech.dto.UserDTO;
+import org.antontech.dto.UserDTOMapper;
 import org.antontech.model.User;
 import org.antontech.repository.UserHibernateDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.antontech.service.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
 public class UserService {
     @Autowired
     private UserHibernateDao userDao;
-    private Logger logger = LoggerFactory.getLogger(UserService.class);
+    @Autowired
+    private UserDTOMapper userDTOMapper;
 
-    public List<User> getUsers() {
-        return userDao.getUsers();
+    public List<UserDTO> getUsers() {
+        return userDao.getUsers()
+                .stream()
+                .map(userDTOMapper)
+                .collect(Collectors.toList());
     }
 
     public boolean save(User user) {
         return userDao.save(user);
     }
 
-    public User getById(long id) { return userDao.getById(id); }
+    public UserDTO getUserDTOById(long id) {
+        User u = userDao.getById(id);
+        if (u != null)
+            return userDTOMapper.apply(u);
+        else
+            throw new ResourceNotFoundException("User with id " + id + " not found");
+    }
 
-    public List<User> getByIndustry(String industry) {
-        return userDao.getByIndustry(industry);
+    public User getUserSecurityById(long id) {
+        return userDao.getById(id);
+    }
+
+    public List<UserDTO> getByIndustry(String industry) {
+        return userDao.getByIndustry(industry)
+                .stream()
+                .map(userDTOMapper)
+                .collect(Collectors.toList());
     }
 
     public void updateEmail(long id, String email) {
@@ -38,7 +57,9 @@ public class UserService {
         userDao.updatePassword(id, password);
     }
 
-    public void updateCompany(long id, String companyName, String address, String industry) { userDao.updateCompany(id, companyName, address, industry); }
+    public void updateCompany(long id, String companyName, String address, String industry) {
+        userDao.updateCompany(id, companyName, address, industry);
+    }
 
     public void updateManager(long id, String firstName, String lastName, String title, String phone) {
         userDao.updateManager(id, firstName, lastName, title, phone);

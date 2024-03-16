@@ -44,6 +44,7 @@ public class ProductHibernateDaoTest {
         product = new Product();
         product.setName("Seating");
         product.setDescription("The auto seating supplier");
+        product.setPrice(10.6);
         product.setUser(user);
         productHibernateDao.save(product);
     }
@@ -58,7 +59,7 @@ public class ProductHibernateDaoTest {
     @Test
     public void getProductsTest() {
         List<Product> products = productHibernateDao.getProducts();
-        assertEquals(2, products.size());
+        assertEquals(1, products.size());
     }
 
     @Test

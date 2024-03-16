@@ -82,7 +82,7 @@ public class SecurityFilter implements Filter {
             Claims claims = jwtService.decryptToken(token);
             logger.info("===== after parsing JWT token, claims.getId()={}", claims.getId());
             if(claims.getId() != null) {
-                User u = userService.getById(Long.valueOf(claims.getId()));
+                User u = userService.getUserSecurityById(Long.valueOf(claims.getId()));
                 HttpSession session = req.getSession(true);
                 session.setAttribute("loggedInUserId", Long.valueOf(claims.getId()));
                 if(u != null) {

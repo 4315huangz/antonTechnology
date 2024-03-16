@@ -3,6 +3,7 @@ package org.antontech.config;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.antontech.dto.UserDTO;
 import org.antontech.model.Role;
 import org.antontech.model.User;
 import org.antontech.service.UserService;
@@ -27,7 +28,7 @@ public class CacheConfig<T> {
                 .build(new CacheLoader<Long, List<Role>>() {
                             @Override
                             public List<Role> load(Long userId) throws Exception {
-                                User user = userService.getById(userId);
+                                User user = userService.getUserSecurityById(userId);
                                 return user != null ? user.getRoles() : null;
                             }
                         });

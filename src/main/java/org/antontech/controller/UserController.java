@@ -1,7 +1,9 @@
 package org.antontech.controller;
 
+import org.antontech.dto.UserDTO;
 import org.antontech.model.User;
 import org.antontech.service.UserService;
+import org.antontech.service.exception.ResourceNotFoundException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +23,9 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<List<User>> getUsers() {
+    public ResponseEntity<List<UserDTO>> getUsers() {
         logger.info("I am in getUsers controller");
-        List<User> users = userService.getUsers();
+        List<UserDTO> users = userService.getUsers();
         if(users == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
@@ -39,17 +41,19 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity getUserById(@PathVariable(name = "id") long id) {
-        User u = userService.getById(id);
-        if (u == null)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + id + " not found");
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(u);
+    public ResponseEntity<UserDTO> getUserById(@PathVariable(name = "id") long id) {
+        try {
+            UserDTO u = userService.getUserDTOById(id);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(u);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @RequestMapping(value = "/search/{industry}", method = RequestMethod.GET)
-    public ResponseEntity<List<User>> getByIndustry(@PathVariable(name = "industry") String industry) {
+    public ResponseEntity<List<UserDTO>> getByIndustry(@PathVariable(name = "industry") String industry) {
         logger.info("Pass in variable industry {}.", industry);
-        List<User> users = userService.getByIndustry(industry.toLowerCase().trim());
+        List<UserDTO> users = userService.getByIndustry(industry.toLowerCase().trim());
         if (users == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         return ResponseEntity.ok(users);

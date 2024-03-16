@@ -21,6 +21,8 @@ public class Product {
     private String name;
     @Column(name = "description")
     private String description;
+    @Column(name = "price")
+    private double price;
 
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "user_id")
@@ -28,7 +30,7 @@ public class Product {
 
     public Product() {
     }
-    public Product(long id, String name, String description) {
+    public Product(long id, String name, String description, double price) {
     }
 
     public long getId() {
@@ -54,6 +56,10 @@ public class Product {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public double getPrice() { return price;}
+
+    public void setPrice(double price) {this.price = price;}
 
     public User getUser() {return user;}
 

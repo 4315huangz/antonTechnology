@@ -15,5 +15,6 @@ public class ProjectDTO {
     private Date startDate;
     private String description;
     private String manager;
-    private List<Long> userIds;
+    private List<Long> participateId;
+    private List<String> participateCompany;
 }

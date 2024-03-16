@@ -35,7 +35,7 @@ public class ProductHibernateDaoTest {
     @InjectMocks
     private ProductHibernateDao productDao;
 
-    Product product = new Product(2, "Unit Test Product", "Unit Test Product");
+    Product product = new Product(2, "Unit Test Product", "Unit Test Product", 10.6);
     List<Product> res = List.of(product);
 
     @Test
