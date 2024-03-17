@@ -1,14 +1,12 @@
 package org.antontech.service;
 
-import org.antontech.ApplicationBootstrap;
 import org.antontech.model.Role;
 import org.antontech.repository.RoleHibernateDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +18,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApplicationBootstrap.class)
+@RunWith(MockitoJUnitRunner.class)
 public class RoleServiceTest {
     @Mock
     private RoleHibernateDao mockRoleDao;

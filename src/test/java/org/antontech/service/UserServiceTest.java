@@ -1,10 +1,8 @@
 package org.antontech.service;
 
-import org.antontech.ApplicationBootstrap;
 import org.antontech.dto.UserDTO;
 import org.antontech.dto.UserDTOMapper;
 import org.antontech.model.User;
-import org.antontech.repository.Exception.UserDaoException;
 import org.antontech.repository.UserHibernateDao;
 import org.antontech.service.exception.ResourceNotFoundException;
 import org.junit.Before;
@@ -12,9 +10,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApplicationBootstrap.class)
+@RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
     @Mock
     private UserDTOMapper mockUserDTOMapper;

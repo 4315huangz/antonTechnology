@@ -108,10 +108,10 @@ public class SecurityFilter implements Filter {
                         if(roleService.getAllowedDeleteResources(role) != null)
                             allowedDeleteResources = String.join(roleService.getAllowedDeleteResources(role), allowedDeleteResources, ",");
                     }
-                    logger.info("======, allowedReadResources = {}", allowedReadResources);
-                    logger.info("======, allowedCreateResources = {}", allowedCreateResources);
-                    logger.info("======, allowedUpdateResources = {}", allowedUpdateResources);
-                    logger.info("======, allowedDeleteResources = {}", allowedDeleteResources);
+                    logger.debug("======, allowedReadResources = {}", allowedReadResources);
+                    logger.debug("======, allowedCreateResources = {}", allowedCreateResources);
+                    logger.debug("======, allowedUpdateResources = {}", allowedUpdateResources);
+                    logger.debug("======, allowedDeleteResources = {}", allowedDeleteResources);
                     String verb = req.getMethod();
                     String allowedResources = "";
                     switch (verb) {
