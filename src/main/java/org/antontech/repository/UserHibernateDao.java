@@ -221,7 +221,7 @@ public class UserHibernateDao implements IUserDao {
     }
 
     @Override
-    public User getUserByCredentials(String email, String password) throws Exception {
+    public User getUserByCredentials(String email, String password) throws UserDaoException {
         String hql = "FROM User as u where lower(u.email) = :email and u.password = :password";
         logger.info(String.format("User email: %s, password: %s", email, password));
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();

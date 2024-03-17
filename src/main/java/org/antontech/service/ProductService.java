@@ -4,7 +4,6 @@ import org.antontech.dto.ProductDTO;
 import org.antontech.dto.ProductDTOMapper;
 import org.antontech.dto.UserDTO;
 import org.antontech.model.Product;
-import org.antontech.model.User;
 import org.antontech.repository.IProductDao;
 import org.antontech.service.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
@@ -26,6 +25,7 @@ public class ProductService {
     private Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public List<ProductDTO> getProducts() {
+        logger.debug("Get all productDTOs at productService.");
         return productDao.getProducts()
                 .stream()
                 .map(productDTOMapper)
@@ -33,6 +33,7 @@ public class ProductService {
     }
 
     public ProductDTO getById(long id) {
+        logger.debug("Get product DTO by id at productService.");
         Product p = productDao.getById(id);
         if(p != null)
             return productDTOMapper.apply(p);
@@ -57,12 +58,14 @@ public class ProductService {
     }
 
     public List<ProductDTO> searchByDescription(String keyword) {
+        logger.debug("Find product through description keyword.");
         return productDao.searchByDescription(keyword)
                 .stream().map(productDTOMapper)
                 .collect(Collectors.toList());
     }
 
     public void notifyAntonTechnology(ProductDTO productDto, UserDTO user) {
+        logger.debug("Send consulting request to the broker.");
         String subject = "Consulting Service Requested";
         String emailContent = "The User: " + user.getId() + "\n"
                 + "Name: " + user.getName()

@@ -3,6 +3,7 @@ package org.antontech.service;
 import org.antontech.dto.UserDTO;
 import org.antontech.dto.UserDTOMapper;
 import org.antontech.model.User;
+import org.antontech.repository.Exception.UserDaoException;
 import org.antontech.repository.UserHibernateDao;
 import org.antontech.service.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +70,12 @@ public class UserService {
         userDao.delete(id);
     }
 
-    public User getUserByCredentials(String email, String password) throws Exception {
-        return  userDao.getUserByCredentials(email, password);
-    }
+    public User getUserByCredentials(String email, String password) {
+        try {
+            return userDao.getUserByCredentials(email, password);
+        } catch (UserDaoException e) {
+            throw new ResourceNotFoundException("Failed to get user credentials.", e);
+        }
 
+    }
 }
