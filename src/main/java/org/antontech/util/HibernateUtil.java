@@ -18,7 +18,7 @@ public class HibernateUtil {
     private static final Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
 
     public static SessionFactory getSessionFactory() {
-        logger.info("Start create session factory");
+        logger.debug("Start create session factory");
         if (sessionFactory == null) {
             try {
                 String[] modelPackages = {"org.antontech.model"};
