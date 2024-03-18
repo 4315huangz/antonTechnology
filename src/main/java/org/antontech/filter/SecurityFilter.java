@@ -1,12 +1,9 @@
 package org.antontech.filter;
 
 import io.jsonwebtoken.Claims;
-import org.antontech.model.Role;
-import org.antontech.model.User;
-import org.antontech.service.RoleCacheService;
+import org.antontech.service.ResourceCacheService;
 import org.antontech.service.JWTService;
-import org.antontech.service.RoleService;
-import org.antontech.service.UserService;
+import org.antontech.service.ResourceLoadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +23,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @WebFilter(filterName = "SecurityFilter", urlPatterns = "/*", dispatcherTypes = {DispatcherType.REQUEST})
@@ -34,11 +31,9 @@ public class SecurityFilter implements Filter {
     @Autowired
     private JWTService jwtService;
     @Autowired
-    private UserService userService;
+    private ResourceCacheService resourceCacheService;
     @Autowired
-    private RoleService roleService;
-    @Autowired
-    RoleCacheService roleCacheService;
+    private ResourceLoadService resourceLoadService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     private static final Set<String> IGNORED_PATHS = new HashSet<>((Arrays.asList("/auth")));
@@ -82,65 +77,48 @@ public class SecurityFilter implements Filter {
             Claims claims = jwtService.decryptToken(token);
             logger.info("===== after parsing JWT token, claims.getId()={}", claims.getId());
             if(claims.getId() != null) {
-                User u = userService.getUserSecurityById(Long.valueOf(claims.getId()));
+                long userId = Long.valueOf(claims.getId());
                 HttpSession session = req.getSession(true);
-                session.setAttribute("loggedInUserId", Long.valueOf(claims.getId()));
-                if(u != null) {
-                    List<Role> roles = roleCacheService.getRoles(Long.valueOf(claims.getId()));
-                    if (roles == null || roles.isEmpty()) {
-                        logger.info("Roles not found in cache. Fetching from the database.");
-                        roles = u.getRoles();
-                        roleCacheService.putRoles(Long.valueOf(claims.getId()), roles);
-                    } else {
-                        logger.info("Roles found in cache.");
-                    }
-                    String allowedReadResources = "";
-                    String allowedCreateResources = "";
-                    String allowedUpdateResources = "";
-                    String allowedDeleteResources = "";
-                    for (Role role : roles) {
-                        if(roleService.getAllowedReadResources(role) != null)
-                            allowedReadResources = String.join(roleService.getAllowedReadResources(role), allowedReadResources, ",");
-                        if(roleService.getAllowedCreateResources(role) != null)
-                            allowedCreateResources = String.join(roleService.getAllowedCreateResources(role), allowedCreateResources, ",");
-                        if(roleService.getAllowedUpdateResources(role) != null)
-                            allowedUpdateResources = String.join(roleService.getAllowedUpdateResources(role), allowedUpdateResources, ",");
-                        if(roleService.getAllowedDeleteResources(role) != null)
-                            allowedDeleteResources = String.join(roleService.getAllowedDeleteResources(role), allowedDeleteResources, ",");
-                    }
-                    logger.debug("======, allowedReadResources = {}", allowedReadResources);
-                    logger.debug("======, allowedCreateResources = {}", allowedCreateResources);
-                    logger.debug("======, allowedUpdateResources = {}", allowedUpdateResources);
-                    logger.debug("======, allowedDeleteResources = {}", allowedDeleteResources);
-                    String verb = req.getMethod();
-                    String allowedResources = "";
-                    switch (verb) {
-                        case "GET":
-                            allowedResources = allowedReadResources;
-                            break;
-                        case "POST":
-                            allowedResources = allowedCreateResources;
-                            break;
-                        case "PUT":
-                            allowedResources = allowedUpdateResources;
-                            break;
-                        case "PATCH":
-                            allowedResources = allowedUpdateResources;
-                            break;
-                        case "DELETE":
-                            allowedResources = allowedDeleteResources;
-                    }
-                    logger.info("======, allowedResources = {}", allowedResources);
-                    if(allowedResources.trim().isEmpty()) return statusCode;
-                    for (String s : allowedResources.split(",")) {
-                        if (uri.trim().toLowerCase().startsWith(s.trim().toLowerCase())) {
-                            statusCode = HttpServletResponse.SC_ACCEPTED;
-                            break;
-                        }
+                session.setAttribute("loggedInUserId", userId);
+                Map<String, String> allowedResourcesMap = resourceCacheService.getAllowedResources(userId);
+                if (allowedResourcesMap == null || allowedResourcesMap.isEmpty()) {
+                    logger.info("Allowed resources not found in cache. Fetching from the database.");
+                    allowedResourcesMap = resourceLoadService.loadAllowedResources(userId);
+                    resourceCacheService.putAllowedResources(userId, allowedResourcesMap);
+                } else {
+                    logger.info("Allowed resources found in cache.");
+                }
+                String allowedReadResources = allowedResourcesMap.get("allowedReadResources");
+                String allowedCreateResources = allowedResourcesMap.get("allowedCreateResources");;
+                String allowedUpdateResources = allowedResourcesMap.get("allowedUpdateResources");;
+                String allowedDeleteResources = allowedResourcesMap.get("allowedDeleteResources");;
+                String verb = req.getMethod();
+                String allowedResources = "";
+                switch (verb) {
+                    case "GET":
+                        allowedResources = allowedReadResources;
+                        break;
+                    case "POST":
+                        allowedResources = allowedCreateResources;
+                        break;
+                    case "PUT":
+                        allowedResources = allowedUpdateResources;
+                        break;
+                    case "PATCH":
+                        allowedResources = allowedUpdateResources;
+                        break;
+                    case "DELETE":
+                        allowedResources = allowedDeleteResources;
+                }
+                logger.info("======, allowedResources = {}", allowedResources);
+                if(allowedResources.trim().isEmpty()) return statusCode;
+                for (String s : allowedResources.split(",")) {
+                    if (uri.trim().toLowerCase().startsWith(s.trim().toLowerCase())) {
+                        statusCode = HttpServletResponse.SC_ACCEPTED;
+                        break;
                     }
                 }
             }
-
         } catch (Exception e) {
             logger.info("Cannot get token {}", e.getMessage());
         }

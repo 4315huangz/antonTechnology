@@ -42,7 +42,7 @@ public class JWTService {
         Claims claims = Jwts.parser()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
                 .parseClaimsJws(token).getBody();
-        logger.debug("Claims: {}", claims.toString());
+        logger.info("Claims: {}", claims.toString());
         return claims;
     }
 }
