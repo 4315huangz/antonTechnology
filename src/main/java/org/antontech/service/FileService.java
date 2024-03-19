@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Service
 public class FileService {
-    private String bucketName = "ziwei-ascending-2101";
+    private String bucketName = "ascending-training-ziwei";
     private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     AmazonS3 s3Client;

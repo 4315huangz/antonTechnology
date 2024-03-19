@@ -81,13 +81,8 @@ public class SecurityFilter implements Filter {
                 HttpSession session = req.getSession(true);
                 session.setAttribute("loggedInUserId", userId);
                 Map<String, String> allowedResourcesMap = resourceCacheService.getAllowedResources(userId);
-                if (allowedResourcesMap == null || allowedResourcesMap.isEmpty()) {
-                    logger.info("Allowed resources not found in cache. Fetching from the database.");
-                    allowedResourcesMap = resourceLoadService.loadAllowedResources(userId);
-                    resourceCacheService.putAllowedResources(userId, allowedResourcesMap);
-                } else {
-                    logger.info("Allowed resources found in cache.");
-                }
+                resourceCacheService.logCacheStats();
+
                 String allowedReadResources = allowedResourcesMap.get("allowedReadResources");
                 String allowedCreateResources = allowedResourcesMap.get("allowedCreateResources");;
                 String allowedUpdateResources = allowedResourcesMap.get("allowedUpdateResources");;
