@@ -43,6 +43,27 @@ public class FileController {
         }
     }
 
+    @RequestMapping(value = "/download", method = RequestMethod.GET)
+    public ResponseEntity<String> download(@RequestParam(name = "fileUrl") String fileUrl,
+                                   @RequestParam(name = "downloadDirectory") String downloadDirectory) {
+        try {
+            fileService.downloadFile(fileUrl, downloadDirectory);
+            return ResponseEntity.ok("File downloaded successfully");
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid destination directory: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid destination directory: " + e.getMessage());
+        } catch (IOException e) {
+            logger.error("Error downloading file from AWS S3: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error downloading file from AWS S3: " + e.getMessage());
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error occurred: " + e.getMessage());
+        }
+    }
+
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public ResponseEntity delete(@RequestParam(name = "url") String fileUrl) {
         try{
