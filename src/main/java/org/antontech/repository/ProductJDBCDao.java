@@ -71,12 +71,14 @@ public class ProductJDBCDao implements IProductDao {
 
         try {
             con = DriverManager.getConnection(DB_URL, USER, PASS);
-            String sql = "INSERT INTO products (name, description, user_id) VALUES (?,?,?)";
+            String sql = "INSERT INTO products (name, description, price, user_id, sample_picture_url) VALUES (?,?,?,?,?)";
             stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             log.info("Connects to DB and execute the insert query");
             stmt.setString(1, product.getName());
             stmt.setString(2, product.getDescription());
-            stmt.setLong(3, product.getUser().getUserId());
+            stmt.setDouble(3, product.getPrice());
+            stmt.setLong(4, product.getUser().getUserId());
+            stmt.setString(5, product.getPictureUrl());
             stmt.executeUpdate();
 
             rs = stmt.getGeneratedKeys();
@@ -197,6 +199,7 @@ public class ProductJDBCDao implements IProductDao {
         }
     }
 
+
     @Override
     public List<Product> searchByDescription(String keyword) {
         log.info("Start to search Product through description from postgres via JDBC");
@@ -241,4 +244,63 @@ public class ProductJDBCDao implements IProductDao {
         return products;
     }
 
+
+    @Override
+    public String getPictureUrl(long id) {
+        log.info("Start to get picture URL from postgres via JDBC");
+        String url = "";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        log.debug("setup required attributes");
+
+        try {
+            con = DriverManager.getConnection(DB_URL, USER, PASS);
+            String sql = "SELECT sample_picture_url FROM products WHERE product_id = ?";
+            ps = con.prepareStatement(sql);
+            ps.setLong(1, id);
+            rs = ps.executeQuery();
+            log.info("Connects to DB and execute the select query");
+            if (rs.next()) {
+                url = rs.getString("sample_picture_url");
+            }
+        } catch (SQLException e){
+            log.error("Unable to connect to db or execute select query", e);
+        } finally {
+            try {
+                if(rs != null) rs.close();
+                if(ps != null) ps.close();
+                if(con != null) con.close();
+            } catch (SQLException e) {
+                log.error("Unable to close the JDBC Connection",e);
+            }
+        }
+        return url;
+    }
+
+    @Override
+    public void savePictureUrl(long id, String url) {
+        log.info("Start to save picture URL to database");
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try {
+            con = DriverManager.getConnection(DB_URL, USER, PASS);
+            String sql = "UPDATE products SET sample_picture_url = ? WHERE product_id = ?";
+            ps = con.prepareStatement(sql);
+            ps.setString(1, url);
+            ps.setLong(2, id);
+            int rowsAffected = ps.executeUpdate();
+            log.info(rowsAffected + " rows affected");
+        } catch (SQLException e) {
+            log.error("Unable to save picture URL to database", e);
+        } finally {
+            try {
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                log.error("Unable to close the JDBC Connection", e);
+            }
+        }
+    }
 }

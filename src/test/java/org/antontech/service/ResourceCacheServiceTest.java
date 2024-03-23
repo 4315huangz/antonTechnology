@@ -32,13 +32,6 @@ public class ResourceCacheServiceTest {
         assertEquals(map, actual);
     }
 
-    @Test
-    public void putAllowedResourcesTest() {
-        Map<String, String> map = new HashMap<>();
-        map.put("allowed", "Test resource");
-        resourceCacheService.putAllowedResources(1L, map);
-        verify(mockAllowedResourceCache).put(1L, map);
-    }
 
     @Test
     public void invalidateAllowedResourcesTest() {

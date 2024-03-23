@@ -46,6 +46,7 @@ public class ProductHibernateDaoTest {
         product.setDescription("The auto seating supplier");
         product.setPrice(10.6);
         product.setUser(user);
+        product.setPictureUrl("Test Url");
         productHibernateDao.save(product);
     }
 
@@ -85,5 +86,19 @@ public class ProductHibernateDaoTest {
     public void searchByDescriptionKeywordTest() {
         List<Product> productList = productHibernateDao.searchByDescription("Test");
         assertEquals(1, productList.size());
+    }
+
+    @Test
+    public void getPictureUrlTest() {
+        String expectedUrl = product.getPictureUrl();
+        assertEquals(expectedUrl, productHibernateDao.getPictureUrl(product.getId()));
+    }
+
+    @Test
+    public void savePictureUrlTest() {
+        String expectedUrl = "New Test Url";
+        productHibernateDao.savePictureUrl(product.getId(), expectedUrl);
+        String actual = productHibernateDao.getPictureUrl(product.getId());
+        assertEquals(expectedUrl, actual);
     }
 }

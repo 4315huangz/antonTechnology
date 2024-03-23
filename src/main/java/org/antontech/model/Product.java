@@ -1,5 +1,8 @@
 package org.antontech.model;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
@@ -12,6 +15,8 @@ import javax.persistence.JoinColumn;
 
 @Entity
 @Table(name = "products")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,15 +28,13 @@ public class Product {
     private String description;
     @Column(name = "price")
     private double price;
+    @Column(name = "sample_picture_url")
+    private String pictureUrl;
 
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "user_id")
     private User user;
 
-    public Product() {
-    }
-    public Product(long id, String name, String description, double price) {
-    }
 
     public long getId() {
         return id;
@@ -64,4 +67,12 @@ public class Product {
     public User getUser() {return user;}
 
     public void setUser(User user) {this.user = user;}
+
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
+
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
+    }
 }

@@ -156,6 +156,50 @@ public class ProductHibernateDao implements IProductDao {
     }
 
     @Override
+    public String getPictureUrl(long id) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        String url = "";
+        log.info("Start to get product's picture url in postgres via HibernateDao");
+        try {
+            Session session = sessionFactory.openSession();
+            Product product = session.get(Product.class, id);
+            if (product != null) {
+                url = product.getPictureUrl();
+            }
+            session.close();
+        } catch (HibernateException e) {
+            log.error("Error while retrieving picture URL for product with id " + id, e);
+            throw new ProductDaoException("Failed to get product picture url", e);
+        }
+        return url;
+    }
+
+    @Override
+    public void savePictureUrl(long id, String url) {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        log.info("Start to delete product in postgres via HibernateDao");
+        Transaction transaction = null;
+        try {
+            Session session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+            Product product = session.get(Product.class, id);
+            if (product != null) {
+                product.setPictureUrl(url);
+                session.update(product);
+                transaction.commit();
+                session.close();
+            }
+        } catch (HibernateException e) {
+            if(transaction != null) {
+                log.error("Delete transaction failed, rollback.");
+                transaction.rollback();
+            }
+            log.error("Error while saving picture URL for product with id " + id, e);
+            throw new ProductDaoException("Failed to save product picture url", e);
+        }
+    }
+
+    @Override
     public List<Product> searchByDescription(String keyword) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         log.info("Start to search product by keyword in postgres via HibernateDao");

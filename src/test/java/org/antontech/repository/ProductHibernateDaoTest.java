@@ -1,6 +1,7 @@
 package org.antontech.repository;
 
 import org.antontech.model.Product;
+import org.antontech.model.User;
 import org.antontech.repository.Exception.ProductDaoException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -35,7 +36,7 @@ public class ProductHibernateDaoTest {
     @InjectMocks
     private ProductHibernateDao productDao;
 
-    Product product = new Product(2, "Unit Test Product", "Unit Test Product", 10.6);
+    Product product = new Product(2, "Unit Test Product", "Unit Test Product", 10.6, "testUrl", new User());
     List<Product> res = List.of(product);
 
     @Test
@@ -80,7 +81,7 @@ public class ProductHibernateDaoTest {
 
     @Test(expected = ProductDaoException.class)
     public void getByIdTest_getProductDaoException_throwProductDaoException() {
-        try(MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
+        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
@@ -105,7 +106,7 @@ public class ProductHibernateDaoTest {
 
     @Test(expected = ProductDaoException.class)
     public void saveProduct_failTest() {
-        try(MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
+        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
             mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
             when(mockSessionFactory.openSession()).thenReturn(mockSession);
             when(mockSession.beginTransaction()).thenReturn(mockTransaction);
@@ -203,6 +204,41 @@ public class ProductHibernateDaoTest {
 
             List<Product> actualRes = productDao.searchByDescription("Test");
             assertEquals(res, actualRes);
+        }
+    }
+
+    @Test
+    public void getPictureUrlTest() {
+        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
+            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
+            when(mockSessionFactory.openSession()).thenReturn(mockSession);
+            when(mockSession.get(eq(Product.class), anyLong())).thenReturn(product);
+            doNothing().when(mockSession).close();
+
+            String actualRes = productDao.getPictureUrl(product.getId());
+            assertEquals(product.getPictureUrl(), actualRes);
+        }
+    }
+
+    @Test
+    public void savePictureUrlTest() {
+        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
+            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
+            when(mockSessionFactory.openSession()).thenReturn(mockSession);
+            when(mockSession.beginTransaction()).thenReturn(mockTransaction);
+            when(mockSession.get(eq(Product.class), anyLong())).thenReturn(product);
+            doNothing().when(mockSession).update(eq(Product.class));
+            doNothing().when(mockTransaction).commit();
+            doNothing().when(mockSession).close();
+
+            productDao.savePictureUrl(product.getId(), "NewUrl");
+
+            verify(mockSessionFactory, times(1)).openSession();
+            verify(mockSession, times(1)).beginTransaction();
+            verify(mockSession, times(1)).get(eq(Product.class), anyLong());
+            verify(mockSession, times(1)).update(product);
+            verify(mockSession, times(1)).close();
+            verify(mockTransaction, times(1)).commit();
         }
     }
 }

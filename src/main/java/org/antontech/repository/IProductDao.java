@@ -19,4 +19,7 @@ public interface IProductDao {
 
     void delete(long id);
 
+    String getPictureUrl(long id);
+
+    void savePictureUrl(long id, String url);
 }
