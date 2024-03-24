@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -124,4 +126,21 @@ public class ProductController {
         }
         logger.info("The session is null.");
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Your request of consulting service has been received.");
-    }}
+    }
+
+    @RequestMapping(value = "/upload/{id}", method = RequestMethod.POST)
+    public ResponseEntity<String> uploadProductPicture(@PathVariable(name = "id") long productId,
+                                               @RequestParam(name = "url") MultipartFile pictureFile) {
+        try {
+            productService.uploadProductSamplePicture(productId, pictureFile);
+            logger.info("Picture uploaded successfully for product with ID: {}", productId);
+            return ResponseEntity.ok("Picture uploaded successfully");
+        } catch (IOException e) {
+            logger.error("Error uploading picture for product with ID: {}", productId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload picture");
+        } catch (ResourceNotFoundException e) {
+            logger.error("Product with ID {} not found", productId, e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+        }
+    }
+}

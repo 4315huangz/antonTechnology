@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +24,9 @@ public class ProductService {
     private EmailService emailService;
     @Autowired
     private ProductDTOMapper productDTOMapper;
+    @Autowired
+    private FileService fileService;
+
     private Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public List<ProductDTO> getProducts() {
@@ -52,6 +57,17 @@ public class ProductService {
     public void updateDescription(long id, String description) {
         productDao.updateDescription(id, description);
     }
+
+    public void uploadProductSamplePicture(long productId, MultipartFile file) throws IOException {
+        String pictureUrl = fileService.uploadFile(file);
+        Product product = productDao.getById(productId);
+        if(product != null) {
+            productDao.savePictureUrl(product.getId(), pictureUrl);
+        } else {
+            throw new ResourceNotFoundException("Product with id " + productId + " not found");
+        }
+    }
+
 
     public void delete(long id) {
         productDao.delete(id);

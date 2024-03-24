@@ -1,12 +1,12 @@
 package org.antontech.service;
 
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import org.antontech.service.exception.InvalidFileTypeException;
+import org.antontech.service.exception.ResourceNotFoundException;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +16,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,7 +52,7 @@ public class FileService {
         objectMetadata.setContentLength(file.getSize());
         PutObjectRequest request = new PutObjectRequest(bucketName, newFileName, file.getInputStream(), objectMetadata);
         s3Client.putObject(request);
-        return s3Client.getUrl(bucketName, file.getName()).toString();
+        return s3Client.getUrl(bucketName, newFileName).toString();
     }
 
     public void downloadFile(String fileUrl, String destinationDirectory) throws IOException {
@@ -77,6 +78,17 @@ public class FileService {
         int lastSlashIndex = fileUrl.lastIndexOf('/');
         String key = fileUrl.substring(lastSlashIndex + 1);
         logger.info("Construct the key for file to be deleted: {}", key);
-        s3Client.deleteObject(new DeleteObjectRequest(bucketName, key));
+        try {
+            if (s3Client.doesObjectExist(bucketName, key)) {
+                s3Client.deleteObject(new DeleteObjectRequest(bucketName, key));
+                logger.info("File deleted successfully from S3. File URL: {}", fileUrl);
+            } else {
+                logger.warn("File does not exist in S3. File URL: {}", fileUrl);
+                throw new ResourceNotFoundException("File does not exist in S3");
+            }
+        } catch (AmazonS3Exception e) {
+            logger.error("Error deleting file from AWS S3, error = {}", e.getMessage());
+            throw e;
+        }
     }
 }

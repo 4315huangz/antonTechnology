@@ -1,6 +1,7 @@
 package org.antontech.controller;
 
 import org.antontech.service.FileService;
+import org.antontech.service.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,14 +66,16 @@ public class FileController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public ResponseEntity delete(@RequestParam(name = "url") String fileUrl) {
+    public ResponseEntity<String> delete(@RequestParam(name = "url") String fileUrl) {
         try{
             fileService.deleteFile(fileUrl);
             logger.info("Successfully deleted file from S3. File URL: {}", fileUrl);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("File is deleted from S3 successfully");
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File does not exist in S3");
         } catch (Exception e) {
             logger.error("Unable to delete file from AWS S3, error = {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to delete the file from S3");
         }
     }
 }
