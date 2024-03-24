@@ -18,7 +18,7 @@ import java.util.Date;
 public class JWTService {
     private Logger logger = LoggerFactory.getLogger(getClass());
     private final String SECRET_KEY = System.getProperty("secret.key");
-    private final String ISSUER = System.getProperty("issuer");
+    private final String ISSUER = "com.antontechnology";
     private final long EXPIRATION_TIME = 86400 * 1000;
 
     public String generateToken(User user) {
