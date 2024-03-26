@@ -88,9 +88,9 @@ Resources:
                 - mvn clean compile flyway:migrate -P unit -Ddb_url=${DB_URL}:5432/${DB_NAME} -Ddb_username=${DB_USERNAME} -Ddb_password=${DB_PASSWORD} -q
             build:
               commands:
-                - mvn test -Dspring.profiles.active=unit -Ddatabase.serverName=jdbc:postgresql://${DB_URL}:5432/${DB_NAME} -Ddatabase.username=${DB_USERNAME} -Ddatabase.password=${DB_PASSWORD} -Djwt.expiration=86400 -Djwt.secret=123456789 -q
+                - mvn test -Dspring.profiles.active=test -Ddatabase.serverName=jdbc:postgresql://${DB_URL}:5432/${DB_NAME} -Ddatabase.username=${DB_USERNAME} -Ddatabase.password=${DB_PASSWORD} -Dsecret.key=ziwei-anton -q
         GitCloneDepth: 1
-        Location: https://github.com/ryohang/car-dealer-spring-mvc.git
+        Location: https://github.com/4315huangz/AntonTechnology.git
         Type: GITHUB
   BuildWarFile:
     Type: AWS::CodeBuild::Project
@@ -129,7 +129,7 @@ Resources:
                 - mvn compile package -DskipTests=true -q
                 - aws s3 cp target/*.war s3://${S3}/projects/${HASH}.war
         GitCloneDepth: 1
-        Location: https://github.com/ryohang/car-dealer-spring-mvc.git
+        Location: https://github.com/4315huangz/AntonTechnology.git
         Type: GITHUB
   BuildImage:
     Type: AWS::CodeBuild::Project
@@ -174,7 +174,7 @@ Resources:
                 - echo "export TAG=${IMAGE_TAG}" > tag.sh
                 - aws s3 cp tag.sh s3://${S3}/projects/ --quiet
         GitCloneDepth: 1
-        Location: https://github.com/ryohang/car-dealer-spring-mvc.git
+        Location: https://github.com/4315huangz/AntonTechnology.git
         Type: GITHUB
   UpdateCloudFormation:
     Type: AWS::CodeBuild::Project
@@ -211,7 +211,7 @@ Resources:
               commands:
                 - aws cloudformation update-stack --stack-name ${STACK_NAME} --use-previous-template --parameters ParameterKey=ELBStack,UsePreviousValue=true ParameterKey=SecurityStack,UsePreviousValue=true ParameterKey=Subnets,UsePreviousValue=true ParameterKey=JavaImageTag,ParameterValue=${TAG} ParameterKey=DBName,UsePreviousValue=true ParameterKey=DBUser,UsePreviousValue=true ParameterKey=DBPassword,UsePreviousValue=true ParameterKey=DBEndpoint,UsePreviousValue=true ParameterKey=ECRRepo,UsePreviousValue=true
         GitCloneDepth: 1
-        Location: https://github.com/ryohang/car-dealer-spring-mvc.git
+        Location: https://github.com/4315huangz/AntonTechnology.git
         Type: GITHUB
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -231,8 +231,8 @@ Resources:
                 Provider: GitHub
                 Version: 1
               Configuration:
-                Owner: ryohang
-                Repo: car-dealer-spring-mvc
+                Owner: 4315huangz
+                Repo: AntonTechnology
                 Branch: master
                 OAuthToken: !Ref OAuthToken
               OutputArtifacts:
