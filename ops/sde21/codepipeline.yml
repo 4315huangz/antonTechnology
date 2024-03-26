@@ -84,7 +84,7 @@ Resources:
             pre_build:
               commands:
                 - ls
-                - mvn clean compile flyway:migrate
+                - mvn clean compile flyway:migrate -P test -Ddb_url=${DB_URL}:5432/${DB_NAME} -Ddb_username=${DB_USERNAME} -Ddb_password=${DB_PASSWORD} -q
             build:
               commands:
                 - mvn test -Dspring.profiles.active=test -Ddatabase.url=jdbc:postgresql://${DB_URL}:5432/${DB_NAME} -Ddatabase.user=${DB_USERNAME} -Ddatabase.password=${DB_PASSWORD} -Dsecret.key=ziwei-anton -q
