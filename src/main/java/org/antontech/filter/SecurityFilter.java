@@ -32,8 +32,6 @@ public class SecurityFilter implements Filter {
     private JWTService jwtService;
     @Autowired
     private ResourceCacheService resourceCacheService;
-    @Autowired
-    private ResourceLoadService resourceLoadService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     private static final Set<String> IGNORED_PATHS = new HashSet<>((Arrays.asList("/auth")));
