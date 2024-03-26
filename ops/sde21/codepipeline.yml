@@ -83,12 +83,11 @@ Resources:
                 java: corretto17
             pre_build:
               commands:
-                - cd mvc
                 - ls
-                - mvn clean compile flyway:migrate -P unit -Ddb_url=${DB_URL}:5432/${DB_NAME} -Ddb_username=${DB_USERNAME} -Ddb_password=${DB_PASSWORD} -q
+                - mvn clean compile flyway:migrate
             build:
               commands:
-                - mvn test -Dspring.profiles.active=test -Ddatabase.serverName=jdbc:postgresql://${DB_URL}:5432/${DB_NAME} -Ddatabase.username=${DB_USERNAME} -Ddatabase.password=${DB_PASSWORD} -Dsecret.key=ziwei-anton -q
+                - mvn test -Dspring.profiles.active=test -Ddatabase.url=jdbc:postgresql://${DB_URL}:5432/${DB_NAME} -Ddatabase.user=${DB_USERNAME} -Ddatabase.password=${DB_PASSWORD} -Dsecret.key=ziwei-anton -q
         GitCloneDepth: 1
         Location: https://github.com/4315huangz/AntonTechnology.git
         Type: GITHUB
@@ -125,7 +124,6 @@ Resources:
                 - HASH=$(echo ${SRC_HASH} | cut -b 1-8)
             build:
               commands:
-                - cd mvc
                 - mvn compile package -DskipTests=true -q
                 - aws s3 cp target/*.war s3://${S3}/projects/${HASH}.war
         GitCloneDepth: 1
@@ -233,7 +231,7 @@ Resources:
               Configuration:
                 Owner: 4315huangz
                 Repo: AntonTechnology
-                Branch: master
+                Branch: main
                 OAuthToken: !Ref OAuthToken
               OutputArtifacts:
                 - Name: Source
