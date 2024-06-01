@@ -9,17 +9,19 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 
 import java.util.Properties;
 
+@Component
 public class HibernateUtil {
-    private static SessionFactory sessionFactory;
     private static final Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
 
-    public static SessionFactory getSessionFactory() {
+    @Bean
+    public SessionFactory getSessionFactory() {
         logger.debug("Start create session factory");
-        if (sessionFactory == null) {
             try {
                 String[] modelPackages = {"org.antontech.model"};
                 String dbDriver = System.getProperty("database.driver");
@@ -43,12 +45,10 @@ public class HibernateUtil {
                 EntityScanner.scanPackages(modelPackages).addTo(configuration);
                 StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
                 ServiceRegistry serviceRegistry = registryBuilder.applySettings(configuration.getProperties()).build();
-                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+                return configuration.buildSessionFactory(serviceRegistry);
             } catch (HibernateException e) {
                 logger.error("Unable to create sessionFactory", e);
                 throw e;
             }
-        }
-        return sessionFactory;
     }
 }

@@ -1,5 +1,7 @@
 package org.antontech.repository;
 
+import org.antontech.ApplicationBootstrap;
+import org.antontech.model.Product;
 import org.antontech.model.Project;
 import org.antontech.repository.Exception.ProjectDaoException;
 import org.hibernate.HibernateException;
@@ -9,11 +11,13 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.antontech.util.HibernateUtil;
+
+import org.mockito.stubbing.OngoingStubbing;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
 import java.util.List;
@@ -24,9 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ApplicationBootstrap.class)
 public class ProjectHibernateDaoTest {
-    @Mock
+    @MockBean
     private SessionFactory mockSessionFactory;
     @Mock
     private Session mockSession;
@@ -34,144 +39,149 @@ public class ProjectHibernateDaoTest {
     private Query mockQuery;
     @Mock
     private Transaction mockTransaction;
-    @InjectMocks
+    @Autowired
     private ProjectHibernateDao projectDao;
 
-    private Project project = new Project(1, new Date(System.currentTimeMillis()), "Test Description", "TestManager" );
+    private Project project = new Project(1, new Date(System.currentTimeMillis()), "Test Description", "TestManager");
     private List<Project> res = List.of(project);
+
     @Test
     public void getProjectsTest() {
-        try(MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.list()).thenReturn(res);
-            doNothing().when(mockSession).close();
-            List<Project> actualRes = projectDao.getProjects();
-            assertEquals(res, actualRes);
-        }
+        when(mockSessionFactory.openSession()).thenReturn(mockSession);
+        when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
+        when(mockQuery.list()).thenReturn(res);
+        doNothing().when(mockSession).close();
+
+        List<Project> actualRes = projectDao.getProjects();
+
+        assertEquals(res, actualRes);
+        verify(mockSessionFactory, times(1)).openSession();
+        verify(mockSession, times(1)).createQuery(anyString());
+        verify(mockQuery, times(1)).list();
+        verify(mockSession, times(1)).close();
     }
 
-    @Test(expected = ProjectDaoException.class)
+    @Test
     public void getProjectsTest_getProjectDaoExceptionException_throwProjectDaoExceptionException() {
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.list()).thenReturn(res);
-            doThrow(HibernateException.class).when(mockSession).close();
-            projectDao.getProjects();
-        }
+        when(mockSessionFactory.openSession()).thenReturn(mockSession);
+        when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
+        when(mockQuery.list()).thenThrow(HibernateException.class);
+
+        ProjectDaoException exception = assertThrows(ProjectDaoException.class, () ->
+                projectDao.getProjects());
+
+        assertEquals("Failed to get projects due to unexpected error", exception.getMessage());
+        verify(mockSessionFactory, times(1)).openSession();
+        verify(mockSession, times(1)).createQuery(anyString());
+        verify(mockSession, times(1)).close();
     }
 
     @Test
     public void save_happyPass() {
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.beginTransaction()).thenReturn(mockTransaction);
-            doNothing().when(mockTransaction).commit();
-            doNothing().when(mockSession).close();
-            boolean res = projectDao.save(project);
-            assertTrue(res);
-        }
+        when(mockSessionFactory.openSession()).thenReturn(mockSession);
+        when(mockSession.beginTransaction()).thenReturn(mockTransaction);
+        doNothing().when(mockSession).saveOrUpdate(project);
+        doNothing().when(mockTransaction).commit();
+        doNothing().when(mockSession).close();
+
+        boolean res = projectDao.save(project);
+
+        assertTrue(res);
+        verify(mockSession).saveOrUpdate(project);
+        verify(mockTransaction).commit();
+        verify(mockSession).close();
     }
 
-    @Test(expected = ProjectDaoException.class)
+    @Test
     public void save_failTest() {
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.beginTransaction()).thenReturn(mockTransaction);
-            doNothing().when(mockTransaction).commit();
-            doThrow(ProjectDaoException.class).when(mockSession).close();
-            projectDao.save(project);
-        }
+        when(mockSessionFactory.openSession()).thenReturn(mockSession);
+        when(mockSession.beginTransaction()).thenReturn(mockTransaction);
+        doThrow(new HibernateException("Mock Exception")).when(mockSession).saveOrUpdate(project);
+
+        HibernateException exception = assertThrows(HibernateException.class, () ->
+                projectDao.getProjects());
+
+        assertEquals("Mock exception", exception.getMessage());
+        verify(mockTransaction, never()).commit();
+        verify(mockTransaction).rollback();
+        verify(mockSession, never()).close();
     }
 
     @Test
     public void getByIdTest() {
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(anyString(), any())).thenReturn(mockQuery);
-            when(mockQuery.uniqueResult()).thenReturn(project);
-            doNothing().when(mockSession).close();
-            assertEquals(project, projectDao.getById(1));
-        }
+        when(mockSessionFactory.openSession()).thenReturn(mockSession);
+        when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
+        when(mockQuery.setParameter(anyString(), any())).thenReturn(mockQuery);
+        when(mockQuery.uniqueResult()).thenReturn(project);
+        doNothing().when(mockSession).close();
+        assertEquals(project, projectDao.getById(1));
+
     }
 
     @Test
     public void updateDescriptionTest() {
         long id = 2;
         String newDescription = "New description";
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.beginTransaction()).thenReturn(mockTransaction);
-            when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("description"), anyString())).thenReturn(mockQuery);
-            when(mockQuery.executeUpdate()).thenReturn(1);
-            doNothing().when(mockTransaction).commit();
-            doNothing().when(mockSession).close();
-            projectDao.updateDescription(id, newDescription);
-            verify(mockSessionFactory, times(1)).openSession();
-            verify(mockSession, times(1)).beginTransaction();
-            verify(mockSession, times(1)).createQuery(anyString());
-            verify(mockQuery, times(2)).setParameter(anyString(), any());
-            verify(mockSession, times(1)).close();
-            verify(mockTransaction, times(1)).commit();
-            verify(mockQuery, times(1)).executeUpdate();
-        }
+        when(mockSessionFactory.openSession()).thenReturn(mockSession);
+        when(mockSession.beginTransaction()).thenReturn(mockTransaction);
+        when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
+        when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
+        when(mockQuery.setParameter(eq("description"), anyString())).thenReturn(mockQuery);
+        when(mockQuery.executeUpdate()).thenReturn(1);
+        doNothing().when(mockTransaction).commit();
+        doNothing().when(mockSession).close();
+        projectDao.updateDescription(id, newDescription);
+        verify(mockSessionFactory, times(1)).openSession();
+        verify(mockSession, times(1)).beginTransaction();
+        verify(mockSession, times(1)).createQuery(anyString());
+        verify(mockQuery, times(2)).setParameter(anyString(), any());
+        verify(mockSession, times(1)).close();
+        verify(mockTransaction, times(1)).commit();
+        verify(mockQuery, times(1)).executeUpdate();
+
     }
 
     @Test
     public void updateManagerTest() {
         long id = 1;
         String newManager = "New manager";
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.beginTransaction()).thenReturn(mockTransaction);
-            when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("manager"), anyString())).thenReturn(mockQuery);
-            when(mockQuery.executeUpdate()).thenReturn(1);
-            doNothing().when(mockTransaction).commit();
-            doNothing().when(mockSession).close();
-            projectDao.updateManager(id, newManager);
-            verify(mockSessionFactory, times(1)).openSession();
-            verify(mockSession, times(1)).beginTransaction();
-            verify(mockSession, times(1)).createQuery(anyString());
-            verify(mockQuery, times(2)).setParameter(anyString(), any());
-            verify(mockSession, times(1)).close();
-            verify(mockTransaction, times(1)).commit();
-            verify(mockQuery, times(1)).executeUpdate();
-        }
+        when(mockSessionFactory.openSession()).thenReturn(mockSession);
+        when(mockSession.beginTransaction()).thenReturn(mockTransaction);
+        when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
+        when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
+        when(mockQuery.setParameter(eq("manager"), anyString())).thenReturn(mockQuery);
+        when(mockQuery.executeUpdate()).thenReturn(1);
+        doNothing().when(mockTransaction).commit();
+        doNothing().when(mockSession).close();
+        projectDao.updateManager(id, newManager);
+        verify(mockSessionFactory, times(1)).openSession();
+        verify(mockSession, times(1)).beginTransaction();
+        verify(mockSession, times(1)).createQuery(anyString());
+        verify(mockQuery, times(2)).setParameter(anyString(), any());
+        verify(mockSession, times(1)).close();
+        verify(mockTransaction, times(1)).commit();
+        verify(mockQuery, times(1)).executeUpdate();
+
     }
 
     @Test
     public void deleteTest() {
         long id = 1;
-        try (MockedStatic mockedStatic = mockStatic(HibernateUtil.class)) {
-            mockedStatic.when(HibernateUtil::getSessionFactory).thenReturn(mockSessionFactory);
-            when(mockSessionFactory.openSession()).thenReturn(mockSession);
-            when(mockSession.beginTransaction()).thenReturn(mockTransaction);
-            when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-            when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
-            when(mockQuery.executeUpdate()).thenReturn(1);
-            doNothing().when(mockTransaction).commit();
-            doNothing().when(mockSession).close();
-            projectDao.delete(id);
-            verify(mockSessionFactory, times(1)).openSession();
-            verify(mockSession, times(1)).beginTransaction();
-            verify(mockSession, times(1)).createQuery(anyString());
-            verify(mockQuery, times(1)).setParameter(anyString(), any());
-            verify(mockQuery, times(1)).executeUpdate();
-            verify(mockSession, times(1)).close();
-            verify(mockTransaction, times(1)).commit();
-        }
+        when(mockSessionFactory.openSession()).thenReturn(mockSession);
+        when(mockSession.beginTransaction()).thenReturn(mockTransaction);
+        when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
+        when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
+        when(mockQuery.executeUpdate()).thenReturn(1);
+        doNothing().when(mockTransaction).commit();
+        doNothing().when(mockSession).close();
+        projectDao.delete(id);
+        verify(mockSessionFactory, times(1)).openSession();
+        verify(mockSession, times(1)).beginTransaction();
+        verify(mockSession, times(1)).createQuery(anyString());
+        verify(mockQuery, times(1)).setParameter(anyString(), any());
+        verify(mockQuery, times(1)).executeUpdate();
+        verify(mockSession, times(1)).close();
+        verify(mockTransaction, times(1)).commit();
+
     }
 }

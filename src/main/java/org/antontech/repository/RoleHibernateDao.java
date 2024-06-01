@@ -11,6 +11,7 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,10 +19,12 @@ import java.util.List;
 @Repository
 public class RoleHibernateDao implements IRoleDao {
     private static final Logger logger = LoggerFactory.getLogger(RoleHibernateDao.class);
+    @Autowired
+    SessionFactory sessionFactory;
+
     @Override
     public List<Role> getRoles() {
         logger.info("Start to get roles from postgres via HibernateDao");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         String hql = "From Role";
         try {
             Session session = sessionFactory.openSession();
@@ -38,7 +41,6 @@ public class RoleHibernateDao implements IRoleDao {
     @Override
     public Role getById(long id) {
         logger.info("Start to get role by role id from postgres via HibernateDao");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         String hql = "FROM Role as r WHERE r.id = :Id";
         Role role = null;
         try {
@@ -56,7 +58,6 @@ public class RoleHibernateDao implements IRoleDao {
 
     @Override
     public boolean save(Role role) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to create a role in postgres via HibernateDao");
         Transaction transaction = null;
         try {
@@ -78,7 +79,6 @@ public class RoleHibernateDao implements IRoleDao {
 
     @Override
     public void delete(Role role) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to delete role in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "delete Role as r where r.id = :Id";
@@ -104,7 +104,6 @@ public class RoleHibernateDao implements IRoleDao {
     @Override
     public String getAllowedResources(Role role) {
         logger.info("Start to get allowed resources from role table via Hibernate DAO.");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID";
         try {
             Session session = sessionFactory.openSession();
@@ -122,7 +121,6 @@ public class RoleHibernateDao implements IRoleDao {
     @Override
     public String getAllowedReadResources(Role role) {
         logger.info("Start to get allowed read resources from role table via Hibernate DAO.");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID AND r.allowedRead = true";
         try {
             Session session = sessionFactory.openSession();
@@ -140,7 +138,6 @@ public class RoleHibernateDao implements IRoleDao {
     @Override
     public String getAllowedCreateResources(Role role) {
         logger.info("Start to get allowed create resources from role table via Hibernate DAO.");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID AND r.allowedCreate = true";
         try {
             Session session = sessionFactory.openSession();
@@ -158,7 +155,6 @@ public class RoleHibernateDao implements IRoleDao {
     @Override
     public String getAllowedUpdateResources(Role role) {
         logger.info("Start to get allowed update resources from role table via Hibernate DAO.");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID AND r.allowedUpdate = true";
         try {
             Session session = sessionFactory.openSession();
@@ -176,7 +172,6 @@ public class RoleHibernateDao implements IRoleDao {
     @Override
     public String getAllowedDeleteResources(Role role) {
         logger.info("Start to get allowed delete resources from role table via Hibernate DAO.");
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID AND r.allowedDelete = true";
         try {
             Session session = sessionFactory.openSession();

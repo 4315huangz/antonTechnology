@@ -9,44 +9,47 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.antontech.util.HibernateUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class ProjectHibernateDao implements IProjectDao{
     private final Logger logger = LoggerFactory.getLogger(ProjectHibernateDao.class);
+    @Autowired
+    SessionFactory sessionFactory;
 
     @Override
     public List<Project> getProjects() {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to getProjects from postgres via HibernateDao");
-        List<Project> projects;
+        List<Project> projects = new ArrayList<>();
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             String hql = "From Project p left join fetch p.users";
             Query<Project> query = session.createQuery(hql);
             projects = query.list();
-            session.close();
-            return projects;
         } catch (HibernateException e) {
-            logger.error("Open session exception or close session exception", e);
+            logger.error("Unexpected exception occurred", e);
             throw new ProjectDaoException("Failed to get projects due to unexpected error", e);
+        } finally {
+            if(session != null) session.close();
         }
+        return projects;
     }
 
     @Override
     public boolean save(Project project) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to save project in postgres via HibernateDao");
         Transaction transaction = null;
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             session.saveOrUpdate(project);
             transaction.commit();
-            session.close();
             return true;
         } catch (HibernateException e) {
             if( transaction != null ){
@@ -55,12 +58,13 @@ public class ProjectHibernateDao implements IProjectDao{
             }
             logger.error("Failed to save project ${}", project);
             throw new ProjectDaoException("Failed to save project due to unexpected exception", e);
+        }  finally {
+            if(session != null) session.close();
         }
     }
 
     @Override
     public Project getById(long id) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to get projectById in postgres via HibernateDao");
         String hql = "FROM Project p left join fetch p.users WHERE p.projectId = :Id";
         Project project = null;
@@ -79,7 +83,6 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public void updateDescription(long id, String description) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update project description in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE Project as pr set pr.description = :description WHERE pr.projectId = :id";
@@ -104,7 +107,6 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public void updateManager(long id, String manager) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to update project manager in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "UPDATE Project as pr set pr.manager = :manager WHERE pr.projectId = :id";
@@ -129,7 +131,6 @@ public class ProjectHibernateDao implements IProjectDao{
 
     @Override
     public void delete(long id) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         logger.info("Start to delete project description in postgres via HibernateDao");
         Transaction transaction = null;
         String hql = "delete Project as pr where pr.projectId = :Id";
