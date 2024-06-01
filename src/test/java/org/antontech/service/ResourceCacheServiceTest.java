@@ -9,6 +9,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -24,10 +25,10 @@ public class ResourceCacheServiceTest {
     ResourceCacheService resourceCacheService;
 
     @Test
-    public void getAllowedResourcesTest() {
+    public void getAllowedResourcesTest() throws ExecutionException {
         Map<String, String> map = new HashMap<>();
         map.put("allowed", "Test resource");
-        when(mockAllowedResourceCache.getUnchecked(anyLong())).thenReturn(map);
+        when(mockAllowedResourceCache.get(anyLong())).thenReturn(map);
         Map<String, String> actual = resourceCacheService.getAllowedResources(1L);
         assertEquals(map, actual);
     }

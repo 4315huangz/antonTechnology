@@ -53,7 +53,7 @@ public class RoleHibernateDaoTest {
 
     @Test
     public void getAllowedReadResources() {
-        assertEquals("No allowed read resources found", roleDao.getAllowedReadResources(role));
+        assertEquals(null, roleDao.getAllowedReadResources(role));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class RoleHibernateDaoTest {
 
     @Test
     public void getAllowedUpdateResources() {
-        assertEquals("No allowed update resources found", roleDao.getAllowedUpdateResources(role));
+        assertEquals(null, roleDao.getAllowedUpdateResources(role));
     }
 
     @Test

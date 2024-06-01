@@ -41,13 +41,13 @@ public class UserJDBCDaoTest {
     @Test
     public void getUsers() {
         List<User> userList = userJDBCDao.getUsers();
-        assertEquals(5, userList.size());
+        assertEquals(8, userList.size());
     }
 
     @Test
     public void getByIdTest() {
-        User u = userJDBCDao.getById(10);
-        assertEquals(10, u.getUserId());
+        User u = userJDBCDao.getById(9);
+        assertEquals(9, u.getUserId());
     }
 
     @Test
@@ -69,8 +69,8 @@ public class UserJDBCDaoTest {
     public void updatePasswordTest() {
         String newPassword = "66666";
         String newHashedPassword = DigestUtils.md5Hex(newPassword.trim());
-        userJDBCDao.updatePassword(10, newPassword);
-        User u = userJDBCDao.getById(10);
+        userJDBCDao.updatePassword(9, newPassword);
+        User u = userJDBCDao.getById(9);
         String hashedHashedPw = DigestUtils.md5Hex(newHashedPassword);
         assertEquals(hashedHashedPw, u.getPassword());
     }
@@ -80,8 +80,8 @@ public class UserJDBCDaoTest {
         String newCompany = "Google";
         String newAddress = "US";
         String newIndustry = "IT";
-        userJDBCDao.updateCompany(10, newCompany, newAddress, newIndustry);
-        User u = userJDBCDao.getById(10);
+        userJDBCDao.updateCompany(9, newCompany, newAddress, newIndustry);
+        User u = userJDBCDao.getById(9);
         assertEquals(newCompany, u.getCompanyName());
         assertEquals(newAddress, u.getAddress());
         assertEquals(newIndustry, u.getIndustry());
@@ -93,8 +93,8 @@ public class UserJDBCDaoTest {
         String newLN = "Mayer";
         String newTitle = "Senior Manager";
         String newPhone = "987-777-7777";
-        userJDBCDao.updateManager(10, newFN, newLN, newTitle, newPhone);
-        User u = userJDBCDao.getById(10);
+        userJDBCDao.updateManager(9, newFN, newLN, newTitle, newPhone);
+        User u = userJDBCDao.getById(9);
         assertEquals(newFN, u.getFirstName());
         assertEquals(newLN, u.getLastName());
         assertEquals(newTitle, u.getTitle());

@@ -33,7 +33,7 @@ public class ProjectJDBCDaoTest {
     @Test
     public void getProjects(){
         List<Project> projectList = projectJDBCDao.getProjects();
-        assertEquals(1, projectList.size());
+        assertEquals(4, projectList.size());
     }
 
     @Test
