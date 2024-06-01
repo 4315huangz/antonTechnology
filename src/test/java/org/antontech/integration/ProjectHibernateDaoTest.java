@@ -62,7 +62,7 @@ public class ProjectHibernateDaoTest {
     @Test
     public void getProjectsTest() throws SQLException {
         List<Project> projectList = projectHibernateDao.getProjects();
-        assertEquals(1, projectList.size());
+        assertEquals(8, projectList.size());
     }
 
     @Test

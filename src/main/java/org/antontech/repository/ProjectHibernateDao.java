@@ -68,33 +68,35 @@ public class ProjectHibernateDao implements IProjectDao{
         logger.info("Start to get projectById in postgres via HibernateDao");
         String hql = "FROM Project p left join fetch p.users WHERE p.projectId = :Id";
         Project project = null;
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             Query<Project> query = session.createQuery(hql);
             query.setParameter("Id", id);
             project = query.uniqueResult();
-            session.close();
-            return project;
         } catch (HibernateException e) {
             logger.error("Unable to get project by project id = {}", id, e);
             throw new ProjectDaoException("Failed to get project due to unexpected exception: " + e.getMessage(), e);
+        } finally {
+            if(session != null) session.close();
         }
+        return project;
     }
 
     @Override
     public void updateDescription(long id, String description) {
         logger.info("Start to update project description in postgres via HibernateDao");
         Transaction transaction = null;
+        Session session = null;
         String hql = "UPDATE Project as pr set pr.description = :description WHERE pr.projectId = :id";
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             Query<Project> query = session.createQuery(hql);
             query.setParameter("id", id);
             query.setParameter("description", description);
             query.executeUpdate();
             transaction.commit();
-            session.close();
         } catch (HibernateException e) {
             if (transaction != null) {
                 logger.error("Update description transaction failed, rollback.");
@@ -102,6 +104,8 @@ public class ProjectHibernateDao implements IProjectDao{
             }
             logger.error("Failed to update project description for {}", id, e);
             throw new ProjectDaoException("Failed to update project description due to unexpected exception" + e.getMessage(), e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 
@@ -109,16 +113,16 @@ public class ProjectHibernateDao implements IProjectDao{
     public void updateManager(long id, String manager) {
         logger.info("Start to update project manager in postgres via HibernateDao");
         Transaction transaction = null;
+        Session session = null;
         String hql = "UPDATE Project as pr set pr.manager = :manager WHERE pr.projectId = :id";
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             Query<Project> query = session.createQuery(hql);
             query.setParameter("id", id);
             query.setParameter("manager", manager);
             query.executeUpdate();
             transaction.commit();
-            session.close();
         } catch (HibernateException e) {
             if (transaction != null) {
                 logger.error("Update manager transaction failed, rollback.");
@@ -126,6 +130,8 @@ public class ProjectHibernateDao implements IProjectDao{
             }
             logger.error("Failed to update project manager for {}", id, e);
             throw new ProjectDaoException("Failed to update project manager due to unexpected exception" + e.getMessage(), e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 
@@ -133,16 +139,16 @@ public class ProjectHibernateDao implements IProjectDao{
     public void delete(long id) {
         logger.info("Start to delete project description in postgres via HibernateDao");
         Transaction transaction = null;
+        Session session = null;
         String hql = "delete Project as pr where pr.projectId = :Id";
 
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             Query<Project> query = session.createQuery(hql);
             query.setParameter("Id", id);
             query.executeUpdate();
             transaction.commit();
-            session.close();
         } catch (HibernateException e) {
             if(transaction != null) {
                 logger.error("Delete transaction failed, rollback.");
@@ -150,6 +156,8 @@ public class ProjectHibernateDao implements IProjectDao{
             }
             logger.error("Unable to delete project id = {}", id, e);
             throw new ProjectDaoException("Failed to delete project due to unexpected exception" + e.getMessage(), e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 }

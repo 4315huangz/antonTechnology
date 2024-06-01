@@ -26,15 +26,17 @@ public class RoleHibernateDao implements IRoleDao {
     public List<Role> getRoles() {
         logger.info("Start to get roles from postgres via HibernateDao");
         String hql = "From Role";
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             Query query = session.createQuery(hql);
             List<Role> roles = query.list();
-            session.close();
             return roles;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
             throw new RoleDaoException("Failed to get roles", e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 
@@ -43,29 +45,31 @@ public class RoleHibernateDao implements IRoleDao {
         logger.info("Start to get role by role id from postgres via HibernateDao");
         String hql = "FROM Role as r WHERE r.id = :Id";
         Role role = null;
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             Query<Role> query = session.createQuery(hql);
             query.setParameter("Id", id);
             role = query.uniqueResult();
-            session.close();
-            return role;
         } catch (HibernateException e) {
             logger.error("Unable to get role by role id = {}", id, e);
             throw new RoleDaoException("Failed to get role", e);
+        } finally {
+            if(session != null) session.close();
         }
+        return role;
     }
 
     @Override
     public boolean save(Role role) {
         logger.info("Start to create a role in postgres via HibernateDao");
         Transaction transaction = null;
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             session.save(role);
             transaction.commit();
-            session.close();
             return true;
         } catch (HibernateException e) {
             if( transaction != null ){
@@ -74,6 +78,8 @@ public class RoleHibernateDao implements IRoleDao {
             }
             logger.error("Failed to save role {}", role);
             throw new RoleDaoException("Failed to save role", e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 
@@ -81,16 +87,16 @@ public class RoleHibernateDao implements IRoleDao {
     public void delete(Role role) {
         logger.info("Start to delete role in postgres via HibernateDao");
         Transaction transaction = null;
+        Session session = null;
         String hql = "delete Role as r where r.id = :Id";
 
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
             Query<Product> query = session.createQuery(hql);
             query.setParameter("Id", role.getId());
             query.executeUpdate();
             transaction.commit();
-            session.close();
         } catch (HibernateException e) {
             if(transaction != null) {
                 logger.error("Delete transaction failed, rollback.");
@@ -98,6 +104,8 @@ public class RoleHibernateDao implements IRoleDao {
             }
             logger.error("Unable to delete role id = {}", role.getId(), e);
             throw new RoleDaoException("Failed to delete role", e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 
@@ -105,16 +113,18 @@ public class RoleHibernateDao implements IRoleDao {
     public String getAllowedResources(Role role) {
         logger.info("Start to get allowed resources from role table via Hibernate DAO.");
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID";
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             Query<String> query = session.createQuery(hql);
             query.setParameter("roleID", role.getId());
             String allowedResources = query.uniqueResult();
-            session.close();
             return allowedResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
             throw new RoleDaoException("Failed to get allowed resources", e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 
@@ -122,16 +132,18 @@ public class RoleHibernateDao implements IRoleDao {
     public String getAllowedReadResources(Role role) {
         logger.info("Start to get allowed read resources from role table via Hibernate DAO.");
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID AND r.allowedRead = true";
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             Query<String> query = session.createQuery(hql);
             query.setParameter("roleID", role.getId());
             String allowedReadResources = query.uniqueResult();
-            session.close();
             return allowedReadResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
             throw new RoleDaoException("Failed to get allowed read resources", e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 
@@ -139,16 +151,18 @@ public class RoleHibernateDao implements IRoleDao {
     public String getAllowedCreateResources(Role role) {
         logger.info("Start to get allowed create resources from role table via Hibernate DAO.");
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID AND r.allowedCreate = true";
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             Query<String> query = session.createQuery(hql);
             query.setParameter("roleID", role.getId());
             String allowedCreateResources = query.uniqueResult();
-            session.close();
             return allowedCreateResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
             throw new RoleDaoException("Failed to get allowed create resources", e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 
@@ -156,16 +170,18 @@ public class RoleHibernateDao implements IRoleDao {
     public String getAllowedUpdateResources(Role role) {
         logger.info("Start to get allowed update resources from role table via Hibernate DAO.");
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID AND r.allowedUpdate = true";
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             Query<String> query = session.createQuery(hql);
             query.setParameter("roleID", role.getId());
             String allowedUpdateResources = query.uniqueResult();
-            session.close();
             return allowedUpdateResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
             throw new RoleDaoException("Failed to get allowed update resources", e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 
@@ -173,16 +189,18 @@ public class RoleHibernateDao implements IRoleDao {
     public String getAllowedDeleteResources(Role role) {
         logger.info("Start to get allowed delete resources from role table via Hibernate DAO.");
         String hql = "SELECT r.allowedResource From Role as r WHERE r.id = :roleID AND r.allowedDelete = true";
+        Session session = null;
         try {
-            Session session = sessionFactory.openSession();
+            session = sessionFactory.openSession();
             Query<String> query = session.createQuery(hql);
             query.setParameter("roleID", role.getId());
             String allowedDeleteResources = query.uniqueResult();
-            session.close();
             return allowedDeleteResources;
         } catch (HibernateException e) {
             logger.error("Open session exception or close session exception");
             throw new RoleDaoException("Failed to get allowed delete resources", e);
+        } finally {
+            if(session != null) session.close();
         }
     }
 }

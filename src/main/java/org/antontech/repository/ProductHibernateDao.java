@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.antontech.util.HibernateUtil;
 
 
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ public class ProductHibernateDao implements IProductDao {
     public List<Product> getProducts() {
         log.info("Start to getProducts from postgres via HibernateDao");
         List<Product> products = new ArrayList<>();
-        ;
         Session session = null;
         try {
             session = sessionFactory.openSession();
@@ -78,7 +76,6 @@ public class ProductHibernateDao implements IProductDao {
             transaction = session.beginTransaction();
             session.save(product);
             transaction.commit();
-            return true;
         } catch (HibernateException e) {
             if (transaction != null) {
                 log.error("Save transaction failed, rollback.");
@@ -91,6 +88,7 @@ public class ProductHibernateDao implements IProductDao {
                 session.close();
             }
         }
+        return true;
     }
 
     @Override
