@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserJDBCDao implements IUserDao{
-    private static final String DB_URL = "jdbc:postgresql://localhost:5430/antontech_db";
-    private static final String USER = "admin";
-    private static final String PASS = "ziwei123!";
+    private static final String DB_URL = System.getProperty("database.url");
+    private static final String USER = System.getProperty("database.user");
+    private static final String PASS = System.getProperty("database.password");
     private static final Logger log = LoggerFactory.getLogger(UserJDBCDao.class);
 
     @Override
