@@ -3,6 +3,8 @@ package org.antontech.controller;
 import org.antontech.model.User;
 import org.antontech.service.JWTService;
 import org.antontech.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ public class AuthController {
     JWTService jwtService;
     @Autowired
     UserService userService;
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity userLogin(@RequestBody User user) {
@@ -28,8 +31,8 @@ public class AuthController {
             }
             return ResponseEntity.ok().body(jwtService.generateToken(u));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error during login", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }

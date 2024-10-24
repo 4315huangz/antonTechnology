@@ -19,7 +19,7 @@ public class JWTService {
     private Logger logger = LoggerFactory.getLogger(getClass());
     private final String SECRET_KEY = System.getProperty("secret.key");
     private final String ISSUER = "com.antontechnology";
-    private final long EXPIRATION_TIME = 86400 * 1000;
+    private final long EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
     public String generateToken(User user) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;

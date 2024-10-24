@@ -2,7 +2,6 @@ package org.antontech.model;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;

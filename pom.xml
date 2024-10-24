@@ -91,7 +91,7 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>LATEST</version>
+            <version>1.12.14</version>
         </dependency>
 
         <dependency>
@@ -180,6 +180,12 @@
                 <version>3.3.2</version>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
     <profiles>
         <profile>
@@ -193,9 +199,9 @@
                         <version>6.0.4</version>
                         <configuration>
                             <driver>org.postgresql.Driver</driver>
-                            <url>jdbc:postgresql://localhost:5430/antontech_db</url>
-                            <user>admin</user>
-                            <password>ziwei123!</password>
+                            <url>${db.url}</url>
+                            <user>${db.user}</user>
+                            <password>${db.password}</password>
                             <locations>
                                 <location>db/migration</location>
                             </locations>
@@ -218,9 +224,9 @@
                         <version>6.0.4</version>
                         <configuration>
                             <driver>org.postgresql.Driver</driver>
-                            <url>jdbc:postgresql://${db_url}</url>
-                            <user>${db_username}</user>
-                            <password>${db_password}</password>
+                            <url>jdbc:postgresql://localhost:5430/antontech_db</url>
+                            <user>admin</user>
+                            <password>ziwei123!</password>
                             <locations>
                                 <location>db/migration</location>
                             </locations>

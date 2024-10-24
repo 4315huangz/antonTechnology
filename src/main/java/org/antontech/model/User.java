@@ -53,7 +53,7 @@ public class User {
     @JsonIgnore
     private Set<Product> products;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(name = "users_projects",
             joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "user_id")},
             inverseJoinColumns = { @JoinColumn(name = "project_id", referencedColumnName = "project_id")}
@@ -61,7 +61,7 @@ public class User {
     @JsonIgnore
     private List<Project> projects;
 
-    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = { @JoinColumn(name = "user_id")},
             inverseJoinColumns = { @JoinColumn(name = "role_id")}
