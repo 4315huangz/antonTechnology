@@ -68,6 +68,14 @@ public class ProductService {
         }
     }
 
+    public void deleteProductSamplePicture(long productId) throws IOException {
+        Product product = productDao.getById(productId);
+        if(product != null) {
+            productDao.deletePictureUrl(product.getId());
+        } else {
+            throw new ResourceNotFoundException("Product with id " + productId + " not found");
+        }
+    }
 
     public void delete(long id) {
         productDao.delete(id);
@@ -93,6 +101,6 @@ public class ProductService {
                 + "Description: " + productDto.getDescription() + "\n"
                 + "Company: " + productDto.getCompany() + "\n"
                 + "Industry: " + productDto.getIndustry();
-        emailService.notifyAntonTechnology(subject, emailContent);
+        emailService.notifyAntonTechnology(subject, emailContent, user.getEmail());
     }
 }

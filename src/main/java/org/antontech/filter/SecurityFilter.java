@@ -75,37 +75,36 @@ public class SecurityFilter implements Filter {
             logger.info("===== after parsing JWT token, claims.getId()={}", claims.getId());
             if(claims.getId() != null) {
                 long userId = Long.valueOf(claims.getId());
+
                 HttpSession session = req.getSession(true);
                 session.setAttribute("loggedInUserId", userId);
+
                 Map<String, String> allowedResourcesMap = resourceCacheService.getAllowedResources(userId);
                 resourceCacheService.logCacheStats();
 
-                String allowedReadResources = allowedResourcesMap.get("allowedReadResources");
-                String allowedCreateResources = allowedResourcesMap.get("allowedCreateResources");;
-                String allowedUpdateResources = allowedResourcesMap.get("allowedUpdateResources");;
-                String allowedDeleteResources = allowedResourcesMap.get("allowedDeleteResources");;
-                String verb = req.getMethod();
-                String allowedResources = "";
-                switch (verb) {
+                String allowedResources = null;
+                switch (req.getMethod()) {
                     case "GET":
-                        allowedResources = allowedReadResources;
+                        allowedResources = allowedResourcesMap.get("allowedReadResources");
                         break;
                     case "POST":
-                        allowedResources = allowedCreateResources;
+                        allowedResources = allowedResourcesMap.get("allowedCreateResources");
                         break;
                     case "PUT":
-                        allowedResources = allowedUpdateResources;
+                        allowedResources = allowedResourcesMap.get("allowedUpdateResources");
                         break;
                     case "PATCH":
-                        allowedResources = allowedUpdateResources;
+                        allowedResources = allowedResourcesMap.get("allowedUpdateResources");
                         break;
                     case "DELETE":
-                        allowedResources = allowedDeleteResources;
+                        allowedResources = allowedResourcesMap.get("allowedDeleteResources");;
                 }
                 logger.info("======, allowedResources = {}", allowedResources);
-                if(allowedResources.trim().isEmpty()) return statusCode;
+                if(allowedResources == null || allowedResources.trim().isEmpty())
+                    return statusCode;
+                uri = uri.trim().toLowerCase();
                 for (String s : allowedResources.split(",")) {
-                    if (uri.trim().toLowerCase().startsWith(s.trim().toLowerCase())) {
+                    if (uri.startsWith(s.trim().toLowerCase())) {
                         statusCode = HttpServletResponse.SC_ACCEPTED;
                         break;
                     }

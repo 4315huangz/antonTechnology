@@ -303,4 +303,9 @@ public class ProductJDBCDao implements IProductDao {
             }
         }
     }
+
+    @Override
+    public void deletePictureUrl(long id) {
+
+    }
 }

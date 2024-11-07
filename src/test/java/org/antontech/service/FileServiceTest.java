@@ -6,6 +6,7 @@ import org.antontech.ApplicationBootstrap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 @SpringBootTest(classes = ApplicationBootstrap.class)
 public class FileServiceTest {
     @Autowired
@@ -31,10 +32,8 @@ public class FileServiceTest {
     @Mock
     private File mockFile;
 
-
     @Autowired
     private AmazonS3 mockS3Client;
-
 
     @Test
     public void uploadFIleTest() throws IOException {

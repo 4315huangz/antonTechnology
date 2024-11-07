@@ -226,6 +226,34 @@ public class ProductHibernateDao implements IProductDao {
     }
 
     @Override
+    public void deletePictureUrl(long id) {
+        log.info("Start to delete product's picture url in postgres via HibernateDao");
+        Transaction transaction = null;
+        Session session = null;
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+            Product product = session.get(Product.class, id);
+            if (product != null) {
+                product.setPictureUrl("");
+                session.update(product);
+                transaction.commit();
+            }
+        } catch (HibernateException e) {
+            if (transaction != null) {
+                log.error("Delete product picture failed, rollback.");
+                transaction.rollback();
+            }
+            log.error("Error while deleting picture URL for product with id " + id, e);
+            throw new ProductDaoException("Failed to delete product picture url", e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    @Override
     public List<Product> searchByDescription(String keyword) {
         log.info("Start to search product by keyword in postgres via HibernateDao");
         String hql = "FROM Product P WHERE lower(P.description) LIKE lower(:keyword)";

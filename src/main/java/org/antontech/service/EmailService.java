@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class EmailService {
     @Autowired
     private AmazonSimpleEmailService sesClient;
-    private final String ANTON_TECHNOLOGY_CONTACT = "ziweih1993@gmail.com";
+    private final String ANTON_TECHNOLOGY_CONTACT = "antontechnology2022@gmail.com";
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     public void sendEmail(String to, String subject, String body) {
@@ -35,14 +35,13 @@ public class EmailService {
         }
     }
 
-    public void notifyAntonTechnology(String subject, String body ) {
+    public void notifyAntonTechnology(String subject, String body, String from ) {
         SendEmailRequest request = new SendEmailRequest()
                 .withDestination(new Destination().withToAddresses(ANTON_TECHNOLOGY_CONTACT))
                 .withMessage(new Message()
-                        .withBody(new Body()
-                                .withText(new Content().withCharset("UTF-8").withData(body)))
+                        .withBody(new Body().withText(new Content().withCharset("UTF-8").withData(body)))
                         .withSubject(new Content().withCharset("UTF-8").withData(subject)))
-                .withSource("ziwei.huang@marquette.edu");
+                .withSource(from);
         try {
             SendEmailResult result = sesClient.sendEmail(request);
             logger.info("Notification ID: " + result.getMessageId() + " successfully sent to Anton Technology");

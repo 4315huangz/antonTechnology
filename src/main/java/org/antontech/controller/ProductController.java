@@ -3,6 +3,7 @@ package org.antontech.controller;
 import org.antontech.dto.ProductDTO;
 import org.antontech.dto.UserDTO;
 import org.antontech.model.Product;
+import org.antontech.service.FileService;
 import org.antontech.service.ProductService;
 import org.antontech.service.UserService;
 import org.antontech.service.exception.ResourceNotFoundException;
@@ -33,6 +34,8 @@ public class ProductController {
     private ProductService productService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private FileService fileService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<List<ProductDTO>> getProducts() {
@@ -141,6 +144,30 @@ public class ProductController {
         } catch (ResourceNotFoundException e) {
             logger.error("Product with ID {} not found", productId, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+        }
+    }
+
+    @RequestMapping(value = "/picture/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteProductPicture(@PathVariable(name = "id") long productId) {
+        logger.info("I am in deleteProductPicture controller");
+        ProductDTO p = productService.getById(productId);
+        if (p == null) {
+            logger.error("Product with ID {} not found", productId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+        }
+        String url = p.getPictureUrl();
+        if (url == null || url.isEmpty()) {
+            logger.error("No picture URL found for product with ID {}", productId);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No picture URL associated with the product");
+        }
+        try {
+            fileService.deleteFile(url);
+            productService.deleteProductSamplePicture(productId);
+            logger.info("Picture deleted successfully for product with ID: {}", productId);
+            return ResponseEntity.ok("Picture deleted successfully");
+        }  catch (Exception e) {
+            logger.error("An error occurred while deleting the picture for product ID {}", productId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }
