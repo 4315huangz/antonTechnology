@@ -49,19 +49,22 @@ public class ProjectService {
         project.setDescription(projectDTO.getDescription());
         project.setManager(projectDTO.getManager());
 
+        projectDao.save(project);
+        logger.debug("End save project at service layer.");
+
         List<User> users = new ArrayList<>();
-        logger.debug("Save this project to each associated user.");
+        logger.debug("Associate the project with each user.");
         for(long userId : projectDTO.getParticipateId()) {
             User user = userDao.getById(userId);
             if(user == null)
                 throw new ResourceNotFoundException("User not found for ID: " + userId);
             user.getProjects().add(project);
-            userDao.save(user);
             users.add(user);
         }
-        logger.debug("Save the participated users for created project.");
+        logger.debug("Associate the users with the saved project and update the user entities.");
         project.setUsers(users);
-        Hibernate.initialize(project.getUsers());
+        for(User user : users) { userDao.save(user); }
+        logger.debug("Project successfully associated with users.");
 
         logger.debug("Send the notification to participants of saved project.");
         for(User user : project.getUsers()) {
