@@ -1,6 +1,6 @@
 package org.antontech.repository;
 
-import org.antontech.ApplicationBootstrap;
+
 import org.antontech.model.Project;
 import org.antontech.repository.Exception.ProjectDaoException;
 import org.hibernate.HibernateException;
@@ -11,13 +11,9 @@ import org.hibernate.query.Query;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-
+import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Date;
 import java.util.List;
 
@@ -27,10 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApplicationBootstrap.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ProjectHibernateDaoTest {
-    @MockBean
+    @Mock
     private SessionFactory mockSessionFactory;
     @Mock
     private Session mockSession;
@@ -38,7 +33,7 @@ public class ProjectHibernateDaoTest {
     private Query mockQuery;
     @Mock
     private Transaction mockTransaction;
-    @Autowired
+    @InjectMocks
     private ProjectHibernateDao projectDao;
 
     private Project project = new Project(1, new Date(System.currentTimeMillis()), "Test Description", "TestManager");
@@ -171,7 +166,6 @@ public class ProjectHibernateDaoTest {
     public void deleteTest() {
         long id = 1;
         when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-        when(mockQuery.setParameter(eq("id"), anyLong())).thenReturn(mockQuery);
         when(mockQuery.executeUpdate()).thenReturn(1);
         doNothing().when(mockTransaction).commit();
         doNothing().when(mockSession).close();

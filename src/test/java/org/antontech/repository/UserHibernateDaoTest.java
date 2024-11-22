@@ -1,8 +1,6 @@
 package org.antontech.repository;
 
-import org.antontech.ApplicationBootstrap;
 import org.antontech.model.User;
-import org.antontech.repository.Exception.ProductDaoException;
 import org.antontech.repository.Exception.UserDaoException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -12,13 +10,9 @@ import org.hibernate.query.Query;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-
+import org.mockito.junit.MockitoJUnitRunner;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -27,10 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApplicationBootstrap.class)
+@RunWith(MockitoJUnitRunner.class)
 public class UserHibernateDaoTest {
-    @MockBean
+    @Mock
     SessionFactory mockSessionFactory;
     @Mock
     Session mockSession;
@@ -38,7 +31,7 @@ public class UserHibernateDaoTest {
     Transaction mockTransaction;
     @Mock
     Query mockQuery;
-    @Autowired
+    @InjectMocks
     UserHibernateDao userDao;
 
     User user = new User(5, "testUser", "testPassword", "Amy", "Michele",
@@ -129,7 +122,6 @@ public class UserHibernateDaoTest {
     public void getByIndustryTest() {
         String industry = "Consulting";
         when(mockSession.createQuery(anyString())).thenReturn(mockQuery);
-        when(mockQuery.setParameter(eq(industry), anyString())).thenReturn(mockQuery);
         when(mockQuery.list()).thenReturn(res);
         doNothing().when(mockSession).close();
 

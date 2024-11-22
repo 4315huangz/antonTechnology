@@ -1,6 +1,5 @@
 package org.antontech.integration;
 
-import junit.framework.Assert;
 import org.antontech.model.User;
 import org.antontech.repository.UserJDBCDao;
 import org.apache.commons.codec.digest.DigestUtils;

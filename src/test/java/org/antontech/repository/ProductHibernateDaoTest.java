@@ -11,11 +11,9 @@ import org.hibernate.query.Query;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +25,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductHibernateDaoTest {
-    @MockBean
+    @Mock
     private SessionFactory mockSessionFactory;
     @Mock
     private Session mockSession;
@@ -35,7 +33,7 @@ public class ProductHibernateDaoTest {
     private Query mockQuery;
     @Mock
     private Transaction mockTransaction;
-    @Autowired
+    @InjectMocks
     private ProductHibernateDao productDao;
 
     Product product = new Product(2, "Unit Test Product", "Unit Test Product", 10.6, "testUrl", new User());
@@ -236,7 +234,6 @@ public class ProductHibernateDaoTest {
     @Test
     public void savePictureUrlTest() {
         when(mockSession.get(eq(Product.class), anyLong())).thenReturn(product);
-        doNothing().when(mockSession).update(eq(Product.class));
         doNothing().when(mockTransaction).commit();
         doNothing().when(mockSession).close();
 
