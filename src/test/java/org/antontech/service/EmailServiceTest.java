@@ -34,13 +34,13 @@ public class EmailServiceTest {
 
     @Test
     public void notifyAntonTechnologyTest() {
-        emailService.notifyAntonTechnology( "dummy subject", "dummy body");
+        emailService.notifyAntonTechnology( "dummy subject", "dummy body", "dummy receiver");
         verify(mockSes).sendEmail(any(SendEmailRequest.class));
     }
 
     @Test(expected = Exception.class)
     public void notifyAntonTechnologyTest_ExceptionTest() {
         doThrow(Exception.class).when(mockSes.sendEmail(any(SendEmailRequest.class)));
-        emailService.notifyAntonTechnology("dummy subject", "dummy body");
+        emailService.notifyAntonTechnology("dummy subject", "dummy body", "dummy receiver");
     }
 }

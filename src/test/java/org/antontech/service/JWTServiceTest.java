@@ -5,6 +5,8 @@ import org.antontech.ApplicationBootstrap;
 import org.antontech.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -13,10 +15,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApplicationBootstrap.class)
+@RunWith(MockitoJUnitRunner.class)
 public class JWTServiceTest {
-    @Autowired
+    @InjectMocks
     private JWTService jwtService;
 
     @Test

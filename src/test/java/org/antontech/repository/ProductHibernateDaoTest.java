@@ -1,6 +1,5 @@
 package org.antontech.repository;
 
-import org.antontech.ApplicationBootstrap;
 import org.antontech.model.Product;
 import org.antontech.model.User;
 import org.antontech.repository.Exception.ProductDaoException;
@@ -13,10 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
@@ -27,8 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApplicationBootstrap.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ProductHibernateDaoTest {
     @MockBean
     private SessionFactory mockSessionFactory;

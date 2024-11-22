@@ -88,7 +88,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public void notifyAntonTechnology(ProductDTO productDto, UserDTO user) {
+    public void notifyAntonTechnology(ProductDTO productDTO, UserDTO user) {
         logger.debug("Send consulting request to the broker.");
         String subject = "Consulting Service Requested";
         String emailContent = "The User: " + user.getId() + "\n"
@@ -96,11 +96,11 @@ public class ProductService {
                 + "Email: " + user.getEmail() + "\n"
                 + "From Company: " + user.getCompany() + "\n"
                 + "has requested more details about the following product:\n\n"
-                + "Product ID: " + productDto.getId() + "\n"
-                + "Product Name: " + productDto.getName() + "\n"
-                + "Description: " + productDto.getDescription() + "\n"
-                + "Company: " + productDto.getCompany() + "\n"
-                + "Industry: " + productDto.getIndustry();
+                + "Product ID: " + productDTO.getId() + "\n"
+                + "Product Name: " + productDTO.getName() + "\n"
+                + "Description: " + productDTO.getDescription() + "\n"
+                + "Company: " + productDTO.getCompany() + "\n"
+                + "Industry: " + productDTO.getIndustry();
         emailService.notifyAntonTechnology(subject, emailContent, user.getEmail());
     }
 }

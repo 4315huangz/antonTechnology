@@ -22,12 +22,8 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectServiceTest {
@@ -69,13 +65,16 @@ public class ProjectServiceTest {
         project.setDescription("Test project");
         project.setManager("Huang");
         project.setUsers(new ArrayList<>());
+        project.getUsers().add(user1);
+        user1.getProjects().add(project);
+
 
         projectDTO = new ProjectDTO();
-        projectDTO.setProjectId(1);
+        projectDTO.setProjectId(1L);
         projectDTO.setStartDate(new Date());
         projectDTO.setDescription("Test project");
-        projectDTO.setManager("Test Manager");
-        projectDTO.setParticipateId(Collections.singletonList(user1.getUserId()));
+        projectDTO.setManager("Huang");
+        projectDTO.setParticipateId(Collections.singletonList(1L));
     }
 
     @Test
@@ -93,17 +92,19 @@ public class ProjectServiceTest {
 
     @Test
     public void saveTest() {
+        String subject = "Project Created Notification";
+        String body = "Dear Michelle Williams,\n\nThe project with ID 0 has been successfully created.";
+
+        when(mockProjectDao.save(any(Project.class))).thenReturn(true);
         when(mockUserDao.getById(anyLong())).thenReturn(user1);
-        when(mockUserDao.save(any())).thenReturn(true);
-        when(mockProjectDao.save(any())).thenReturn(true);
+        when(mockUserDao.save(any(User.class))).thenReturn(true);
+        doNothing().when(mockEmailService).sendEmail(anyString(), anyString(), anyString());
 
-        boolean actual = projectService.save(projectDTO);
-
-        assertTrue(actual);
-        verify(mockUserDao, times(1)).getById(anyLong());
-        verify(mockUserDao, times(1)).save(any());
-        verify(mockProjectDao, times(1)).save(any());
-        verify(mockEmailService, times(1)).sendEmail(anyString(), anyString(), anyString());
+        assertTrue(projectService.save(projectDTO));
+        verify(mockProjectDao, times(2)).save(any(Project.class));
+        verify(mockUserDao, times(1)).getById(project.getProjectId());
+        verify(mockUserDao, times(1)).save(user1);
+        verify(mockEmailService, times(1)).sendEmail(user1.getEmail(), subject, body);
     }
 
     @Test
@@ -131,42 +132,127 @@ public class ProjectServiceTest {
     }
 
     @Test
+    public void addProjectParticipatesTest_existingUser() {
+        long projectId = 1L;
+        long userId = 1L;
+        User user2 = new User();
+        user2.setUserId(userId);
+        user2.setFirstName("test");
+        user2.setLastName("test");
+        user2.setEmail("test@gmail.com");
+        user2.setProjects(new ArrayList<>());
+
+        Project project2 = new Project();
+        project2.setProjectId(projectId);
+        project2.setUsers(new ArrayList<>());
+        project2.getUsers().add(user2);
+        user2.getProjects().add(project2);
+
+        when(mockUserDao.getById(userId)).thenReturn(user2);
+        when(mockProjectDao.getById(projectId)).thenReturn(project2);
+        when(mockProjectDao.save(any(Project.class))).thenReturn(false);
+        when(mockUserDao.save(any(User.class))).thenReturn(false);
+
+        projectService.addProjectParticipates(projectId, userId);
+
+        verify(mockUserDao, times(2)).getById(anyLong());
+        verify(mockProjectDao, times(2)).getById(anyLong());
+        verify(mockProjectDao, never()).save(project2);
+        verify(mockUserDao, never()).save(user2);
+        verify(mockEmailService, never()).sendEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void addProjectParticipatesTest_successful() {
+        long projectId = 1L;
+        long userId = 1L;
+        User user2 = new User();
+        user2.setUserId(userId);
+        user2.setFirstName("test");
+        user2.setLastName("test");
+        user2.setEmail("test@gmail.com");
+        user2.setProjects(new ArrayList<>());
+
+        Project project2 = new Project();
+        project2.setProjectId(projectId);
+        project2.setUsers(new ArrayList<>());
+
+        when(mockUserDao.getById(userId)).thenReturn(user2);
+        when(mockProjectDao.getById(projectId)).thenReturn(project2);
+        when(mockProjectDao.save(any(Project.class))).thenReturn(true);
+        when(mockUserDao.save(any(User.class))).thenReturn(true);
+
+        projectService.addProjectParticipates(projectId, userId);
+
+        verify(mockUserDao, times(2)).getById(anyLong());
+        verify(mockProjectDao, times(2)).getById(anyLong());
+        verify(mockProjectDao, times(1)).save(project2);
+        verify(mockUserDao, times(1)).save(user2);
+        verify(mockEmailService, times(1)).sendEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void deleteProjectParticipatesTest_userInProject() {
+        long projectId = 1L;
+        long userId = 1L;
+        User user2 = new User();
+        user2.setUserId(userId);
+        user2.setFirstName("test");
+        user2.setLastName("test");
+        user2.setEmail("test@gmail.com");
+        user2.setProjects(new ArrayList<>());
+
+        Project project2 = new Project();
+        project2.setProjectId(projectId);
+        project2.setUsers(new ArrayList<>());
+        project2.getUsers().add(user2);
+        user2.getProjects().add(project2);
+
+        when(mockUserDao.getById(anyLong())).thenReturn(user2);
+        when(mockProjectDao.getById(anyLong())).thenReturn(project2);
+        when(mockProjectDao.save(any(Project.class))).thenReturn(true);
+        when(mockUserDao.save(any(User.class))).thenReturn(true);
+
+        projectService.deleteProjectParticipates(projectId,userId);
+
+        verify(mockUserDao, times(2)).getById(anyLong());
+        verify(mockUserDao, times(1)).save(user2);
+        verify(mockProjectDao, times(2)).getById(anyLong());
+        verify(mockProjectDao, times(1)).save(project2);
+        verify(mockEmailService, times(1)).sendEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void deleteProjectParticipatesTest_userNotInProject() {
+        long projectId = 1L;
+        long userId = 1L;
+        User user2 = new User();
+        user2.setUserId(userId);
+        user2.setFirstName("test");
+        user2.setLastName("test");
+        user2.setEmail("test@gmail.com");
+        user2.setProjects(new ArrayList<>());
+
+        Project project2 = new Project();
+        project2.setProjectId(projectId);
+        project2.setUsers(new ArrayList<>());
+
+        when(mockUserDao.getById(projectId)).thenReturn(user2);
+        when(mockProjectDao.getById(userId)).thenReturn(project2);
+
+        projectService.deleteProjectParticipates(projectId,userId);
+
+        verify(mockUserDao, times(2)).getById(anyLong());
+        verify(mockUserDao, never()).save(user1);
+        verify(mockProjectDao, times(2)).getById(anyLong());
+        verify(mockProjectDao, never()).save(project);
+        verify(mockEmailService, never()).sendEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
     public void deleteTest() {
         projectService.delete(anyLong());
 
         verify(mockProjectDao, times(1)).delete(anyLong());
-    }
-
-    @Test
-    public void addProjectParticipatesTest() {
-        when(mockUserDao.getById(anyLong())).thenReturn(user1);
-        when(mockProjectDao.getById(anyLong())).thenReturn(project);
-
-        projectService.addProjectParticipates(1L, 1L);
-
-        verify(mockUserDao, times(2)).getById(anyLong());
-        verify(mockProjectDao, times(2)).getById(anyLong());
-        verify(mockProjectDao, times(1)).save(any(Project.class));
-        verify(mockEmailService, times(1)).sendEmail(anyString(), anyString(), anyString());
-    }
-
-    @Test
-    public void deleteProjectParticipatesTest() {
-        List<User> users = new ArrayList<>();
-        users.add(user1);
-        project.setUsers(users);
-        List<Project> projects = new ArrayList<>();
-        projects.add(project);
-        user1.setProjects(projects);
-        when(mockUserDao.getById(anyLong())).thenReturn(user1);
-        when(mockProjectDao.getById(anyLong())).thenReturn(project);
-
-        projectService.deleteProjectParticipates(1,1);
-
-        verify(mockUserDao, times(2)).getById(anyLong());
-        verify(mockUserDao, times(1)).save(any(User.class));
-        verify(mockProjectDao, times(2)).getById(anyLong());
-        verify(mockProjectDao, times(1)).save(any(Project.class));
-        verify(mockEmailService, times(1)).sendEmail(anyString(), anyString(), anyString());
     }
 }

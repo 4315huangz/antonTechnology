@@ -95,6 +95,10 @@ public class ProjectService {
         projectDao.updateManager(id, manager);
     }
 
+    public void delete(long id) {
+        projectDao.delete(id);
+    }
+
     public void addProjectParticipates(long projectId, long userId) {
         logger.debug("Update participates of existing project at service layer");
         User user = userDao.getById(userId);
@@ -163,10 +167,6 @@ public class ProjectService {
         } else {
             logger.debug("Project with ID {} does not exist for user with ID {}", projectId, userId);
         }
-    }
-
-    public void delete(long id) {
-        projectDao.delete(id);
     }
 
     private boolean userAlreadyParticipates(long projectId, long userId) {
