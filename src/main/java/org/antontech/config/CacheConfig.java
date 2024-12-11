@@ -26,6 +26,7 @@ public class CacheConfig<T> {
     public LoadingCache<Long, Map<String, String>> allowedResourcesCache() {
         return CacheBuilder.newBuilder()
                 .expireAfterWrite(EXPIRE_DURATION, TimeUnit.MINUTES)
+                .recordStats()
                 .build(new CacheLoader<Long, Map<String, String>>() {
                     @Override
                     public Map<String, String> load(Long userId) throws Exception {
